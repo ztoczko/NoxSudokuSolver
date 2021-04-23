@@ -2,8 +2,10 @@ package pl.nox.sudokusolver;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 public class Sudoku {
@@ -36,15 +38,15 @@ public class Sudoku {
         invalid = false;
     }
 
-    public Sudoku(String sudokuSeed) {
+    public Sudoku(String shortSudokuSeed) {
 
         SudokuField[][] result = new SudokuField[9][];
 
         for (int i = 0; i < 9; i++) {
             result[i] = new SudokuField[9];
             for (int j = 0; j < 9; j++) {
-                result[i][j] = Integer.parseInt(sudokuSeed.substring(i * 9 + j, i * 9 + j + 1)) == 0 ? new SudokuField(false, 0) :
-                        new SudokuField(true, Integer.parseInt(sudokuSeed.substring(i * 9 + j, i * 9 + j + 1)));
+                result[i][j] = Integer.parseInt(shortSudokuSeed.substring(i * 9 + j, i * 9 + j + 1)) == 0 ? new SudokuField(false, 0) :
+                        new SudokuField(true, Integer.parseInt(shortSudokuSeed.substring(i * 9 + j, i * 9 + j + 1)));
             }
         }
         fields = result;
@@ -53,6 +55,80 @@ public class Sudoku {
         isPartOfMultipleSolutions = false;
         invalid = false;
     }
+
+    public static String generateSudokuSeedRandomizer() {
+    	
+    	Random r = new Random();
+    	int tempIndex = 0;
+    	List<Integer> numbers = new ArrayList<>();
+    	StringBuilder sb = new StringBuilder();   	
+    	
+    	//number mutation
+    	for (int i = 0; i < 9; i++) {
+    		numbers.add(i);
+    	}
+    	for (int i = 9; i > 0; i--) {
+    		tempIndex = r.nextInt(i);
+    		sb.append(numbers.get(tempIndex).toString());
+    		numbers.remove(tempIndex);
+    	}
+//    	turn (0, 90, 180, 270)
+    	sb.append(String.valueOf(r.nextInt(4)));
+    	
+//    	mirror - none, horizontal, vertical, both
+    	
+    	sb.append(String.valueOf(r.nextInt(4)));
+    	
+    	return sb.toString();
+    }
+    //TO DO - wywali�, zrobi� od nowa na: String(shortseed) randomizeSeed (randomizer, shortseed);
+//    public void randomize(String randomizer) {
+//    	
+//    	String seed = new String();
+//    	
+//    	for (int i = 0; i < 81; i++) {
+//    		
+//    		switch (fields[i / 9][i % 9].getPossibleValues().get(0)) {
+//    		
+//    		case 1:
+//    			fields[i / 9][i % 9].getPossibleValues().set(0, Integer.parseInt(randomizer.substring(0, 1)));
+//    			break;
+//    		case 2:
+//    			fields[i / 9][i % 9].getPossibleValues().set(0, Integer.parseInt(randomizer.substring(1, 2)));
+//    			break;
+//    		case 3:
+//    			fields[i / 9][i % 9].getPossibleValues().set(0, Integer.parseInt(randomizer.substring(2, 3)));
+//    			break;
+//    		case 4:
+//    			fields[i / 9][i % 9].getPossibleValues().set(0, Integer.parseInt(randomizer.substring(3, 4)));
+//    			break;
+//    		case 5:
+//    			fields[i / 9][i % 9].getPossibleValues().set(0, Integer.parseInt(randomizer.substring(4, 5)));
+//    			break;
+//    		case 6:
+//    			fields[i / 9][i % 9].getPossibleValues().set(0, Integer.parseInt(randomizer.substring(5, 6)));
+//    			break;
+//    		case 7:
+//    			fields[i / 9][i % 9].getPossibleValues().set(0, Integer.parseInt(randomizer.substring(6, 7)));
+//    			break;
+//    		case 8:
+//    			fields[i / 9][i % 9].getPossibleValues().set(0, Integer.parseInt(randomizer.substring(7, 8)));
+//    			break;
+//    		case 9:
+//    			fields[i / 9][i % 9].getPossibleValues().set(0, Integer.parseInt(randomizer.substring(8, 9)));
+//    			break;
+//    		default:
+//    			break;
+//    		
+//    		}
+//    		
+//    	}
+//    	
+//    	//TURN AND MIRROR!!
+//    	
+//    	
+//    	
+//    }
 
 
     public boolean getIsSolved() {
@@ -63,7 +139,7 @@ public class Sudoku {
         return isPartOfMultipleSolutions;
     }
 
-    public boolean heuristicSolve() { //add triples
+    public boolean reasoningSolve() { //add triples
 
         eraseImpossibleValues();
 
@@ -75,7 +151,7 @@ public class Sudoku {
                 }
                 eraseImpossibleValues();
             }
-            if (!findAllPairs() && !findAllTriples() && !findAllQuads() && !findXWings()) {
+            if (!findAllPairs() && !findAllTriples() && !findAllQuads() && !findXWings() && !findXYWings() && !findSwordfish()) {
                 break;
             }
             eraseImpossibleValues();
@@ -133,7 +209,367 @@ public class Sudoku {
 
         return findXWingRows() || findXWingColumns();
     }
+    
+    public boolean findSwordfish() {
 
+        return findSwordfishRows() || findSwordfishColumns();
+    }
+
+     
+    public boolean findXYWings() {
+    	
+    	boolean isChange = false;
+    	List<Integer> fieldsWithTwoPossibilities = new ArrayList<>();
+    	Set<Integer> possibleNumbersSet = new HashSet<>();
+    	int number1 = 0;
+    	int number2 = 0;
+    	int number3 = 0;
+    	List<Integer> fieldsWithN1N2 = new ArrayList<>();
+    	List<Integer> fieldsWithN1N3 = new ArrayList<>();
+    	List<Integer> fieldsWithN2N3 = new ArrayList<>();
+    	
+    	for (int i = 0; i < 9; i++) {    		
+    		for (int j = 0; j < 9; j++) {
+    			
+    			if (!fields[i][j].isSolved() && fields[i][j].getPossibleValues().size() == 2) {
+    				fieldsWithTwoPossibilities.add(i * 9 + j);
+    				possibleNumbersSet.addAll(fields[i][j].getPossibleValues());
+    			}
+    		}
+    	}
+    	
+    	if (fieldsWithTwoPossibilities.size() < 3 || possibleNumbersSet.size() < 3) {
+    		return false;
+    	}
+    	List<Integer> possibleNumbersList = new ArrayList<>(possibleNumbersSet);
+    	possibleNumbersList.sort(Comparator.naturalOrder());
+    	
+    	for (int i = 0; i < possibleNumbersList.size() - 2; i++) {
+    		
+    		for (int j = i + 1; j < possibleNumbersList.size() - 1; j++) {
+    			
+    			fieldsWithN1N2.clear();
+    			number1 = possibleNumbersList.get(i);
+    			number2 = possibleNumbersList.get(j);
+    			for (int fieldNumber : fieldsWithTwoPossibilities) {
+    				
+    				if (fields[fieldNumber / 9][fieldNumber % 9].getPossibleValues().contains(number1) && fields[fieldNumber / 9][fieldNumber % 9].getPossibleValues().contains(number2)) {
+    					fieldsWithN1N2.add(fieldNumber);
+    				}
+    			}
+    			
+    			if (fieldsWithN1N2.size() > 0) {
+    				
+    				for (int k = j + 1; k < possibleNumbersList.size(); k++) {
+    					
+    					fieldsWithN1N3.clear();
+    					fieldsWithN2N3.clear();
+    	    			number3 = possibleNumbersList.get(k);
+    	    			
+    	    			for (int fieldNumber : fieldsWithTwoPossibilities) {
+    	    				
+    	    				if (fields[fieldNumber / 9][fieldNumber % 9].getPossibleValues().contains(number1) && fields[fieldNumber / 9][fieldNumber % 9].getPossibleValues().contains(number3)) {
+    	    					fieldsWithN1N3.add(fieldNumber);
+    	    				}
+    	    				if (fields[fieldNumber / 9][fieldNumber % 9].getPossibleValues().contains(number2) && fields[fieldNumber / 9][fieldNumber % 9].getPossibleValues().contains(number3)) {
+    	    					fieldsWithN2N3.add(fieldNumber);
+    	    				}
+    	    			}
+    	    			
+    	    			if (fieldsWithN1N3.size() > 0 && fieldsWithN2N3.size() > 0) {
+    	    				
+    	    				//KURWA
+    	    				//sprawdzi� relacje (1 x relacja do 2, 2 x relacja do 1) sprawdzi� wiersz/kolumn� relacji do 1 i wyeliminowac wsp�lnego kandydata
+    	    				
+    	    				for (int fieldN1N2 : fieldsWithN1N2) {
+    	    					
+    	    					for (int fieldN2N3 : fieldsWithN2N3) {
+    	    						
+    	    						for (int fieldN1N3 : fieldsWithN1N3) {
+    	    							
+    	    							switch (checkFieldsRelations(fieldN1N2, fieldN2N3, fieldN1N3)) {
+    	    							
+    	    							case 1:
+    	    								if (!fields[fieldN2N3 / 9][fieldN1N3 % 9].isSolved() && fields[fieldN2N3 / 9][fieldN1N3 % 9].getPossibleValues().contains(number3)) {
+    	    									fields[fieldN2N3 / 9][fieldN1N3 % 9].getPossibleValues().remove(Integer.valueOf(number3));
+    	    									isChange = true;
+    	    								}
+    	    								if (!fields[fieldN1N3 / 9][fieldN2N3 % 9].isSolved() && fields[fieldN1N3 / 9][fieldN2N3 % 9].getPossibleValues().contains(number3)) {
+    	    									fields[fieldN1N3 / 9][fieldN2N3 % 9].getPossibleValues().remove(Integer.valueOf(number3));
+    	    									isChange = true;
+    	    								}
+    	    								break;
+    	    							case 2:
+    	    								if (!fields[fieldN1N2 / 9][fieldN1N3 % 9].isSolved() && fields[fieldN1N2 / 9][fieldN1N3 % 9].getPossibleValues().contains(number1)) {
+    	    									fields[fieldN1N2 / 9][fieldN1N3 % 9].getPossibleValues().remove(Integer.valueOf(number1));
+    	    									isChange = true;
+    	    								}
+    	    								if (!fields[fieldN1N3 / 9][fieldN1N2 % 9].isSolved() && fields[fieldN1N3 / 9][fieldN1N2 % 9].getPossibleValues().contains(number1)) {
+    	    									fields[fieldN1N3 / 9][fieldN1N2 % 9].getPossibleValues().remove(Integer.valueOf(number1));
+    	    									isChange = true;
+    	    								}
+    	    								break;
+    	    							case 3:
+    	    								if (!fields[fieldN1N2 / 9][fieldN2N3 % 9].isSolved() && fields[fieldN1N2 / 9][fieldN2N3 % 9].getPossibleValues().contains(number2)) {
+    	    									fields[fieldN1N2 / 9][fieldN2N3 % 9].getPossibleValues().remove(Integer.valueOf(number2));
+    	    									isChange = true;
+    	    								}
+    	    								if (!fields[fieldN2N3 / 9][fieldN1N2 % 9].isSolved() && fields[fieldN2N3 / 9][fieldN1N2 % 9].getPossibleValues().contains(number2)) {
+    	    									fields[fieldN2N3 / 9][fieldN1N2 % 9].getPossibleValues().remove(Integer.valueOf(number2));
+    	    									isChange = true;
+    	    								}
+    	    								break;
+    	    							default:
+    	    									break;    	    							
+    	    							}    	    							
+    	    						}    	    						
+    	    					}
+    	    				}  
+    	    			}    					
+    				}    				
+    			}    			
+    		}    		
+    	}
+    	return isChange;
+    }
+    
+    //zwr�ci numer pola z relacj� podw�jn�, lub 0 je�li nie b�dzie prawid�owej relacji 1-2-1
+    public int checkFieldsRelations(int field1, int field2, int field3) {
+    	
+    	int row1 = field1 / 9;
+    	int row2 = field2 / 9;
+    	int row3 = field3 / 9;
+    	int column1 = field1 % 9;
+    	int column2 = field2 % 9;
+    	int column3 = field3 % 9;
+    	int box1 = row1 / 3 * 3 + column1 / 3; 
+    	int box2 = row2 / 3 * 3 + column2 / 3;
+    	int box3 = row3 / 3 * 3 + column3 / 3;
+    	int relation1 = 0;
+    	int relation2 = 0;
+    	int relation3 = 0;
+    	//check 1
+    	relation1 += row1 == row2 || column1 == column2 || box1 == box2 ? 1 : 0;
+    	relation1 += row1 == row3 || column1 == column3 || box1 == box3 ? 1 : 0;
+    	//check 2
+    	relation2 += row2 == row1 || column2 == column1 || box2 == box1 ? 1 : 0;
+    	relation2 += row2 == row3 || column2 == column3 || box2 == box3 ? 1 : 0;
+    	//check 3
+    	relation3 += row3 == row1 || column3 == column1 || box3 == box1 ? 1 : 0;
+    	relation3 += row3 == row2 || column3 == column2 || box3 == box2 ? 1 : 0;
+    	
+    	if (relation1 + relation2 + relation3 != 4 || relation1 == 0 || relation2 == 0 || relation3 == 0) {
+    		return -1;
+    	}
+    	if (relation1 == 2) {
+    		return 1;
+    	}
+    	if (relation2 == 2) {
+    		return 2;
+    	}
+    	return 3;    		
+    }
+    
+    public boolean findSwordfishRows() {
+    	
+    	boolean isChange = false;
+        boolean numberAlreadySolved = false;
+        List<Integer> columnsWithValueInRow1 = new ArrayList<>();
+        List<Integer> columnsWithValueInRow2 = new ArrayList<>();
+        List<Integer> columnsWithValueInRow3 = new ArrayList<>();
+        Set<Integer> columnsWithValue = new HashSet<>();
+        
+        for (int number = 1; number <= 9; number++) {
+        	
+        	for (int row1 = 0; row1 < 7; row1++) {
+        		
+        		columnsWithValueInRow1.clear();
+        		numberAlreadySolved = false;
+        		for (int i = 0; i < 9; i++) {
+
+                    if (fields[row1][i].isSolved() && fields[row1][i].getPossibleValues().get(0) == number) {
+                        numberAlreadySolved = true;
+                        break;
+                    }
+                    if (fields[row1][i].getPossibleValues().contains(number)) {
+                        columnsWithValueInRow1.add(i);
+                    }
+                }
+                if (numberAlreadySolved) {
+                    continue;
+                }
+        		if (columnsWithValueInRow1.size() == 2 || columnsWithValueInRow1.size() == 3) {
+        			
+        			for (int row2 = row1 + 1; row2 < 8; row2++) {
+        				
+        				columnsWithValueInRow2.clear();
+                		numberAlreadySolved = false;
+                		for (int i = 0; i < 9; i++) {
+
+                            if (fields[row2][i].isSolved() && fields[row2][i].getPossibleValues().get(0) == number) {
+                                numberAlreadySolved = true;
+                                break;
+                            }
+                            if (fields[row2][i].getPossibleValues().contains(number)) {
+                                columnsWithValueInRow2.add(i);
+                            }
+                        }
+                        if (numberAlreadySolved) {
+                            continue;
+                        }
+                        
+                        if (columnsWithValueInRow2.size() == 2 || columnsWithValueInRow2.size() == 3) {
+                        	
+                        	for (int row3 = row2 + 1; row3 < 9; row3++) {
+                				
+                				columnsWithValueInRow3.clear();
+                        		numberAlreadySolved = false;
+                        		for (int i = 0; i < 9; i++) {
+
+                                    if (fields[row3][i].isSolved() && fields[row3][i].getPossibleValues().get(0) == number) {
+                                        numberAlreadySolved = true;
+                                        break;
+                                    }
+                                    if (fields[row3][i].getPossibleValues().contains(number)) {
+                                        columnsWithValueInRow3.add(i);
+                                    }
+                                }
+                                if (numberAlreadySolved) {
+                                    continue;
+                                }
+                                
+                                if (columnsWithValueInRow3.size() == 2 || columnsWithValueInRow3.size() == 3) {
+                                	
+                                	columnsWithValue.clear();
+                                	columnsWithValue.addAll(columnsWithValueInRow1);
+                                	columnsWithValue.addAll(columnsWithValueInRow2);
+                                	columnsWithValue.addAll(columnsWithValueInRow3);
+                                	
+                                	if (columnsWithValue.size() == 3) {
+                                		
+                                		for (Integer col : columnsWithValue) {
+                                			
+                                			for (int i = 0; i < 9; i++) {
+                                				
+                                				if (i != row1 && i != row2 && i != row3 && !fields[i][col].isSolved() && fields[i][col].getPossibleValues().contains(number)) {
+                                					
+                                					isChange = true;
+                                					fields[i][col].getPossibleValues().remove(Integer.valueOf(number));
+                                				}    
+                                			}     
+                                		}
+                                	}                                		
+                                }                                	
+                            }                        	
+                        }        				
+        			}
+        		}                
+        	}
+        }
+        return isChange;    	
+    }
+    
+    
+    public boolean findSwordfishColumns() {
+    	
+    	boolean isChange = false;
+        boolean numberAlreadySolved = false;
+        List<Integer> rowsWithValueInColumn1 = new ArrayList<>();
+        List<Integer> rowsWithValueInColumn2 = new ArrayList<>();
+        List<Integer> rowsWithValueInColumn3 = new ArrayList<>();
+        Set<Integer> rowsWithValue = new HashSet<>();
+        
+        for (int number = 1; number <= 9; number++) {
+        	
+        	for (int column1 = 0; column1 < 7; column1++) {
+        		
+        		rowsWithValueInColumn1.clear();
+        		numberAlreadySolved = false;
+        		for (int i = 0; i < 9; i++) {
+
+                    if (fields[i][column1].isSolved() && fields[i][column1].getPossibleValues().get(0) == number) {
+                        numberAlreadySolved = true;
+                        break;
+                    }
+                    if (fields[i][column1].getPossibleValues().contains(number)) {
+                        rowsWithValueInColumn1.add(i);
+                    }
+                }
+                if (numberAlreadySolved) {
+                    continue;
+                }
+        		if (rowsWithValueInColumn1.size() == 2 || rowsWithValueInColumn1.size() == 3) {
+        			
+        			for (int column2 = column1 + 1; column2 < 8; column2++) {
+        				
+        				rowsWithValueInColumn2.clear();
+                		numberAlreadySolved = false;
+                		for (int i = 0; i < 9; i++) {
+
+                            if (fields[i][column2].isSolved() && fields[i][column2].getPossibleValues().get(0) == number) {
+                                numberAlreadySolved = true;
+                                break;
+                            }
+                            if (fields[i][column2].getPossibleValues().contains(number)) {
+                                rowsWithValueInColumn2.add(i);
+                            }
+                        }
+                        if (numberAlreadySolved) {
+                            continue;
+                        }
+                        
+                        if (rowsWithValueInColumn2.size() == 2 || rowsWithValueInColumn2.size() == 3) {
+                        	
+                        	for (int column3 = column2 + 1; column3 < 9; column3++) {
+                				
+                				rowsWithValueInColumn3.clear();
+                        		numberAlreadySolved = false;
+                        		for (int i = 0; i < 9; i++) {
+
+                                    if (fields[i][column3].isSolved() && fields[i][column3].getPossibleValues().get(0) == number) {
+                                        numberAlreadySolved = true;
+                                        break;
+                                    }
+                                    if (fields[i][column3].getPossibleValues().contains(number)) {
+                                        rowsWithValueInColumn3.add(i);
+                                    }
+                                }
+                                if (numberAlreadySolved) {
+                                    continue;
+                                }
+                                
+                                if (rowsWithValueInColumn3.size() == 2 || rowsWithValueInColumn3.size() == 3) {
+                                	
+                                	rowsWithValue.clear();
+                                	rowsWithValue.addAll(rowsWithValueInColumn1);
+                                	rowsWithValue.addAll(rowsWithValueInColumn2);
+                                	rowsWithValue.addAll(rowsWithValueInColumn3);
+                                	
+                                	if (rowsWithValue.size() == 3) {
+                                		
+                                		for (Integer row : rowsWithValue) {
+                                			
+                                			for (int i = 0; i < 9; i++) {
+                                				
+                                				if (i != column1 && i != column2 && i != column3 && !fields[row][i].isSolved() && fields[row][i].getPossibleValues().contains(number)) {
+                                					
+                                					isChange = true;
+                                					fields[row][i].getPossibleValues().remove(Integer.valueOf(number));
+                                				}    
+                                			}     
+                                		}
+                                	}                                		
+                                }                                	
+                            }                        	
+                        }        				
+        			}
+        		}                
+        	}
+        }
+        return isChange;    	
+    }
+    
+    
     public boolean findXWingRows() {
 
         boolean isChange = false;

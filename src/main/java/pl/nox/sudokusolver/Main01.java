@@ -1,7 +1,5 @@
 package pl.nox.sudokusolver;
 
-import java.util.Scanner;
-
 public class Main01 {
 
     public static void main(String[] args) {
@@ -65,8 +63,19 @@ public class Main01 {
                          0, 0, 0, 0, 0, 5, 0, 0, 6,
                          0, 0, 0, 1, 3, 0, 0, 0, 0,
                          9, 0, 2, 0, 4, 8, 0, 1, 0};
+        
 
         int[] fields7 = {0, 0, 0, 0, 0, 0, 0, 0, 0,
+                		 0, 0, 0, 1, 0, 7, 0, 0, 8,
+                		 0, 7, 0, 3, 9, 2, 5, 4, 1,
+                		 0, 0, 4, 0, 0, 0, 0, 9, 2,
+                		 0, 0, 5, 0, 0, 0, 6, 0, 0,
+                		 9, 3, 0, 0, 0, 0, 4, 0, 0,
+                		 1, 9, 2, 7, 8, 5, 0, 6, 0,
+                		 5, 0, 0, 4, 0, 3, 0, 0, 0,
+                		 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+        int[] fields8 = {0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -87,7 +96,7 @@ public class Main01 {
 //            fields[i] = Integer.parseInt(input);
 //        }
 
-        Sudoku sudoku = new Sudoku(fields6);
+        Sudoku sudoku = new Sudoku(fields7);
 
 
 //        sudoku.fields[0][2].getPossibleValues().remove(Integer.valueOf(1));
@@ -170,7 +179,7 @@ public class Main01 {
 
 //        System.out.println(sudoku.fields[1][1].getPossibleValues());
 
-        System.out.println(sudoku.heuristicSolve());
+        System.out.println(sudoku.reasoningSolve());
 
 //        System.out.println(sudoku.fields[1][1].getPossibleValues());
 //
@@ -181,6 +190,9 @@ public class Main01 {
         System.out.println(sudoku);
         sudoku.checkIfInvalid();
         System.out.println(sudoku.isInvalid());
+        
+        char ch = 49;
+        System.out.println(ch);
 
 //        System.out.println(sudoku.fields[8][1].getPossibleValues());
 //        System.out.println(sudoku.fields[7][1].getPossibleValues());
