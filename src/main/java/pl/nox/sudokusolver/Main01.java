@@ -1,5 +1,7 @@
 package pl.nox.sudokusolver;
 
+import java.util.List;
+
 public class Main01 {
 
     public static void main(String[] args) {
@@ -75,7 +77,27 @@ public class Main01 {
                 		 5, 0, 0, 4, 0, 3, 0, 0, 0,
                 		 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-        int[] fields8 = {0, 0, 0, 0, 0, 0, 0, 0, 0,
+        int[] fields8 = {1, 2, 3, 4, 5, 6, 7, 8, 9,
+                         4, 5, 7, 0, 8, 0, 2, 3, 6,
+                         6, 8, 9, 2, 3, 7, 1, 4, 5,
+                         8, 1, 5, 3, 6, 2, 9, 7, 4,
+                         2, 7, 4, 0, 9, 0, 6, 5, 3,
+                         3, 9, 6, 5, 7, 4, 8, 1, 2,
+                         5, 4, 0, 6, 1, 8, 3, 9, 7,
+                         7, 6, 1, 0, 4, 0, 5, 2, 8,
+                         9, 3, 8, 7, 2, 5, 4, 6, 1};
+
+        int[] fields9 = {1, 2, 3, 0, 0, 0, 0, 0, 0,
+                1, 2, 3, 0, 0, 0, 0, 0, 0,
+                1, 2, 3, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+        int[] fields10 = {0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -87,115 +109,34 @@ public class Main01 {
 
 
 
-//        Scanner userInput = new Scanner(System.in);
-//        String input = new String();
-//
-//        for (int i = 0; i < 81; i++){
-//            System.out.println("Podaj wartość dla pola " + (i + 1));
-//            input = userInput.nextLine();
-//            fields[i] = Integer.parseInt(input);
-//        }
+        String tempseed = "123000000123000000123000000" +
+                          "000000000000000000000000000" +"000000000000000000000000000";
 
-        Sudoku sudoku = new Sudoku(fields7);
-
-
-//        sudoku.fields[0][2].getPossibleValues().remove(Integer.valueOf(1));
-//        sudoku.fields[0][2].getPossibleValues().remove(Integer.valueOf(2));
-//
-//        sudoku.fields[1][0].getPossibleValues().remove(Integer.valueOf(1));
-//        sudoku.fields[1][0].getPossibleValues().remove(Integer.valueOf(2));
-//
-//        sudoku.fields[1][1].getPossibleValues().remove(Integer.valueOf(1));
-//        sudoku.fields[1][1].getPossibleValues().remove(Integer.valueOf(2));
-//
-//        sudoku.fields[1][2].getPossibleValues().remove(Integer.valueOf(1));
-//        sudoku.fields[1][2].getPossibleValues().remove(Integer.valueOf(2));
-//
-//        sudoku.fields[2][0].getPossibleValues().remove(Integer.valueOf(1));
-//        sudoku.fields[2][0].getPossibleValues().remove(Integer.valueOf(2));
-//
-//        sudoku.fields[2][1].getPossibleValues().remove(Integer.valueOf(1));
-//        sudoku.fields[2][1].getPossibleValues().remove(Integer.valueOf(2));
-//
-//        sudoku.fields[2][2].getPossibleValues().remove(Integer.valueOf(1));
-//        sudoku.fields[2][2].getPossibleValues().remove(Integer.valueOf(2));
-
-//        sudoku.fields[0][0].getPossibleValues().remove(Integer.valueOf(1));
-//        sudoku.fields[0][0].getPossibleValues().remove(Integer.valueOf(2));
-//        sudoku.fields[0][0].getPossibleValues().remove(Integer.valueOf(3));
-//        sudoku.fields[0][0].getPossibleValues().remove(Integer.valueOf(4));
-//        sudoku.fields[0][0].getPossibleValues().remove(Integer.valueOf(5));
-//        sudoku.fields[0][0].getPossibleValues().remove(Integer.valueOf(6));
-//        sudoku.fields[0][0].getPossibleValues().remove(Integer.valueOf(7));
-//
-//        sudoku.fields[0][1].getPossibleValues().remove(Integer.valueOf(1));
-//        sudoku.fields[0][1].getPossibleValues().remove(Integer.valueOf(2));
-//        sudoku.fields[0][1].getPossibleValues().remove(Integer.valueOf(3));
-//        sudoku.fields[0][1].getPossibleValues().remove(Integer.valueOf(4));
-//        sudoku.fields[0][1].getPossibleValues().remove(Integer.valueOf(5));
-//        sudoku.fields[0][1].getPossibleValues().remove(Integer.valueOf(6));
-//        sudoku.fields[0][1].getPossibleValues().remove(Integer.valueOf(8));
-//
-//        sudoku.fields[0][2].getPossibleValues().remove(Integer.valueOf(1));
-//        sudoku.fields[0][2].getPossibleValues().remove(Integer.valueOf(2));
-//        sudoku.fields[0][2].getPossibleValues().remove(Integer.valueOf(3));
-//        sudoku.fields[0][2].getPossibleValues().remove(Integer.valueOf(4));
-//        sudoku.fields[0][2].getPossibleValues().remove(Integer.valueOf(5));
-//        sudoku.fields[0][2].getPossibleValues().remove(Integer.valueOf(6));
-//        sudoku.fields[0][2].getPossibleValues().remove(Integer.valueOf(9));
-//
-//        sudoku.fields[8][3].getPossibleValues().remove(Integer.valueOf(7));
-//        sudoku.fields[8][3].getPossibleValues().remove(Integer.valueOf(8));
-//        sudoku.fields[8][3].getPossibleValues().remove(Integer.valueOf(9));
-//
-//        sudoku.fields[8][4].getPossibleValues().remove(Integer.valueOf(7));
-//        sudoku.fields[8][4].getPossibleValues().remove(Integer.valueOf(8));
-//        sudoku.fields[8][4].getPossibleValues().remove(Integer.valueOf(9));
-//
-//        sudoku.fields[8][5].getPossibleValues().remove(Integer.valueOf(7));
-//        sudoku.fields[8][5].getPossibleValues().remove(Integer.valueOf(8));
-//        sudoku.fields[8][5].getPossibleValues().remove(Integer.valueOf(9));
-//
-//        sudoku.fields[8][6].getPossibleValues().remove(Integer.valueOf(7));
-//        sudoku.fields[8][6].getPossibleValues().remove(Integer.valueOf(8));
-//        sudoku.fields[8][6].getPossibleValues().remove(Integer.valueOf(9));
-//
-//        sudoku.fields[8][7].getPossibleValues().remove(Integer.valueOf(7));
-//        sudoku.fields[8][7].getPossibleValues().remove(Integer.valueOf(8));
-//        sudoku.fields[8][7].getPossibleValues().remove(Integer.valueOf(9));
-//
-//        sudoku.fields[8][8].getPossibleValues().remove(Integer.valueOf(7));
-//        sudoku.fields[8][8].getPossibleValues().remove(Integer.valueOf(8));
-//        sudoku.fields[8][8].getPossibleValues().remove(Integer.valueOf(9));
-//
-//        sudoku.findNakedTriplesBox(0);
-//        sudoku.findNakedTriplesRow(0);
-//        sudoku.findHiddenTriplesRow(8);
-//        sudoku.findNakedTriplesBox(6);
-
-
-
-
-
-//        System.out.println(sudoku.fields[1][1].getPossibleValues());
-
-        System.out.println(sudoku.reasoningSolve());
-
-//        System.out.println(sudoku.fields[1][1].getPossibleValues());
-//
-//        System.out.println(sudoku.fields[0][8].getPossibleValues());
-//
-//        System.out.println(sudoku.fields[0][1].getPossibleValues());
+        Sudoku sudoku = new Sudoku(tempseed);
 
         System.out.println(sudoku);
-        sudoku.checkIfInvalid();
-        System.out.println(sudoku.isInvalid());
-        
-        char ch = 49;
-        System.out.println(ch);
 
-//        System.out.println(sudoku.fields[8][1].getPossibleValues());
-//        System.out.println(sudoku.fields[7][1].getPossibleValues());
+        List<Integer> list = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 3);
+
+        tempseed = Sudoku.randomizeShortSeed(tempseed, list);
+
+        sudoku = new Sudoku(tempseed);
+
+        System.out.println(sudoku);
+
+
+
+
+
+
+//        System.out.println(sudoku.bruteForceSolve());
+//
+//
+//        System.out.println(sudoku);
+//        sudoku.checkIfInvalid();
+//        System.out.println(sudoku.isInvalid());
+        
+
 
     }
 }

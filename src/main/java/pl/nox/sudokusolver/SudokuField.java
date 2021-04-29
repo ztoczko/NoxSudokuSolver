@@ -7,7 +7,6 @@ public class SudokuField {
 
 
     private boolean solved;
-    private boolean beingGuessed;
     private List<Integer> possibleValues;
 
     public void setPossibleValues(List<Integer> possibleValues) {
@@ -16,7 +15,6 @@ public class SudokuField {
 
     public SudokuField(boolean solved, int solvedValue) {
         this.solved = solved;
-        this.beingGuessed = false;
 
         List<Integer> possibleValues = new ArrayList<>();
         if (solved) {
@@ -29,6 +27,11 @@ public class SudokuField {
         this.possibleValues = possibleValues;
     }
 
+    public SudokuField(boolean solved, List<Integer> possibleValues) {
+        this(solved, solved ? possibleValues.get(0) : 0);
+        setPossibleValues(possibleValues);
+    }
+
     public boolean isSolved() {
         return solved;
     }
@@ -39,5 +42,17 @@ public class SudokuField {
 
     public List<Integer> getPossibleValues() {
         return possibleValues;
+    }
+
+    public SudokuField clone() {
+       return new SudokuField(solved, this.clonePossibleValues());
+    }
+
+    public List<Integer> clonePossibleValues() {
+        List<Integer> clonedValues = new ArrayList<Integer>();
+        for (Integer i : possibleValues) {
+            clonedValues.add(i);
+        }
+        return clonedValues;
     }
 }
