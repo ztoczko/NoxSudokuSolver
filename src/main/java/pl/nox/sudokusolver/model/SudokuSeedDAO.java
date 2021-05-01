@@ -1,4 +1,4 @@
-package pl.nox.sudokusolver;
+package pl.nox.sudokusolver.model;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,8 +10,10 @@ public class SudokuSeedDAO {
 
     private static DBUtil dBUtil = new DBUtil("mysql:/localhost:3306", "root", "password", "NoxSudoku");
     private static final String CREATE = "INSERT INTO sudokus VALUES (null, ?, ?);";
+    private static final String CREATE_SOLUTION = "INSERT INTO sudokus_solutions VALUES (null, ?, ?);";
     private static final String COUNT_BY_DIFFICULTY = "SELECT COUNT(*) FROM sudokus WHERE difficulty = ?;";
     private static final String READ_BY_ID = "SELECT * FROM sudokus WHERE id = ?";
+    private static final String READ_SOLUTION_BY_ID = "SELECT * FROM sudokus_solutions WHERE sudoku_id = ?";
     private static final String READ_RANDOM_BY_DIFFICULTY = "SELECT * FROM sudokus WHERE difficulty = ? LIMIT ?, 1;";
 
 
@@ -20,6 +22,21 @@ public class SudokuSeedDAO {
         try (Connection conn = dBUtil.connect(); PreparedStatement ps = conn.prepareStatement(CREATE)) {
 
             ps.setInt(1, difficulty);
+            ps.setString(2, shortSeed);
+            if (ps.executeUpdate() != 0) {
+                return true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static boolean createSolution(int sudokuId, String shortSeed) {
+
+        try (Connection conn = dBUtil.connect(); PreparedStatement ps = conn.prepareStatement(CREATE_SOLUTION)) {
+
+            ps.setInt(1, sudokuId);
             ps.setString(2, shortSeed);
             if (ps.executeUpdate() != 0) {
                 return true;
@@ -68,6 +85,25 @@ public class SudokuSeedDAO {
         return null;
     }
 
+    public static String readSolutionById(int sudoku_id) {
+
+        try (Connection conn = dBUtil.connect(); PreparedStatement ps = conn.prepareStatement(READ_SOLUTION_BY_ID)) {
+
+            ps.setInt(1, sudoku_id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                String result = rs.getString(3);
+                rs.close();
+                return result;
+            } else {
+                return null;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static String randomByDifficulty(int difficulty) {
 
         try (Connection conn = dBUtil.connect(); PreparedStatement ps = conn.prepareStatement(READ_RANDOM_BY_DIFFICULTY)) {
@@ -81,7 +117,11 @@ public class SudokuSeedDAO {
             ps.setInt(2, rand.nextInt(size));
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                String result = rs.getString(1) + difficulty + rs.getString(3);
+                String id = rs.getString(1);
+                while (id.length() < 3) {
+                    id = "0" + id;
+                }
+                String result = id + difficulty + rs.getString(3);
                 rs.close();
                 return result;
             } else {

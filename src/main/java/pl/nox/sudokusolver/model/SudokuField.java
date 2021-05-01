@@ -1,4 +1,4 @@
-package pl.nox.sudokusolver;
+package pl.nox.sudokusolver.model;
 
 import java.util.ArrayList;
 import java.util.List;

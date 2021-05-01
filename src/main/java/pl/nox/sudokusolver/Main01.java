@@ -1,5 +1,7 @@
 package pl.nox.sudokusolver;
 
+import pl.nox.sudokusolver.model.Sudoku;
+
 import java.util.List;
 
 public class Main01 {
@@ -118,7 +120,7 @@ public class Main01 {
 
         List<Integer> list = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 3);
 
-        tempseed = Sudoku.randomizeShortSeed(tempseed, list);
+        tempseed = Sudoku.randomizeFieldsSeed(tempseed, list);
 
         sudoku = new Sudoku(tempseed);
 

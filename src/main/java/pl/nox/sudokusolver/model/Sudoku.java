@@ -1,4 +1,4 @@
-package pl.nox.sudokusolver;
+package pl.nox.sudokusolver.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,6 +56,19 @@ public class Sudoku {
         invalid = false;
     }
 
+    public String getSeed() {
+
+        String result = new String();
+
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+
+                result += fields[i][j].isSolved() ? fields[i][j].getPossibleValues().get(0).toString() : "0";
+            }
+        }
+        return result;
+    }
+
     public static List<Integer> generateSudokuSeedRandomizer() {
 
         Random r = new Random();
@@ -93,10 +106,19 @@ public class Sudoku {
         for (int i = 0; i < randomizer.size(); i++) {
             randomizerStr += randomizer.get(i).toString();
         }
-        return shortSeed.substring(0, 2) + randomizerStr + randomizeShortSeed(shortSeed.substring(2), randomizer);
+        return shortSeed.substring(0, 4) + randomizerStr + randomizeFieldsSeed(shortSeed.substring(4), randomizer);
     }
 
-    public static String randomizeShortSeed(String shortSeed, List<Integer> randomizer) {
+    public static String randomizeFieldsSeed(String fieldsSeed, String randomizer) {
+
+        List<Integer> randomizerList = new ArrayList<>();
+        for (int i = 0; i < 11; i++) {
+            randomizerList.add(Integer.valueOf(randomizer.substring(i, i + 1)));
+        }
+        return randomizeFieldsSeed(fieldsSeed, randomizerList);
+    }
+
+    public static String randomizeFieldsSeed(String fieldsSeed, List<Integer> randomizer) {
 
         String result = new String();
         List<Integer> tempSeed = new ArrayList<>();
@@ -104,7 +126,7 @@ public class Sudoku {
 
 
         for (int i = 0; i < 81; i++) {
-            tempSeed.add(shortSeed.substring(i, i + 1).equals("0") ? 0 : randomizer.get(Integer.valueOf(shortSeed.substring(i, i + 1)) - 1));
+            tempSeed.add(fieldsSeed.substring(i, i + 1).equals("0") ? 0 : randomizer.get(Integer.valueOf(fieldsSeed.substring(i, i + 1)) - 1));
         }
         //turning, newRow = column newColumn = size - row
         for (int i = 0; i < 81; i++) {

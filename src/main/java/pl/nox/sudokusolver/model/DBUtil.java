@@ -1,4 +1,4 @@
-package pl.nox.sudokusolver;
+package pl.nox.sudokusolver.model;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
