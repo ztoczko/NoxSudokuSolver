@@ -12,12 +12,15 @@ import java.io.IOException;
 public class Game extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        System.out.println("KURWA");
+        request.setAttribute("page", 1);
         getServletContext().getRequestDispatcher("/WEB-INF/jsp/game.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 //parametry - type new i trudność lub type load i nazwa ciasteczka
+        request.setAttribute("page", 1);
         boolean isParameterError = false;
         String type = request.getParameter("type");
         if (type == null || !(type.equals("load") || type.equals("new"))) {
@@ -38,13 +41,14 @@ public class Game extends HttpServlet {
             }
         }
         if (!isParameterError && type.equals("load")) {
-            String loadedGame = request.getParameter("loadedGame");
+            String loadedGame = request.getParameter("gameToLoad");
             Cookie[] cookies = request.getCookies();
             boolean cookieFound = false;
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(loadedGame)) {
                     cookieFound = true;
                     loadedGame = cookie.getValue();
+                    System.out.println(loadedGame);
                     break;
                 }
             }
@@ -56,7 +60,7 @@ public class Game extends HttpServlet {
                     isParameterError = true;
                 } else {
                     //         id +diff + randomizer
-                    baseSeed = loadedGame.substring(0, 15) + Sudoku.randomizeFieldsSeed(baseSeed.substring(4), loadedGame.substring(4, 15));
+                    baseSeed = loadedGame.substring(0, 15) + Sudoku.randomizeFieldsSeed(baseSeed, loadedGame.substring(4, 15));
                     request.setAttribute("baseSeed", baseSeed); //format id + dif + randomizer + fieldvalues
                     request.setAttribute("loadedGame", loadedGame); //format id + dif + randomizer + fieldvalues + time
                 }

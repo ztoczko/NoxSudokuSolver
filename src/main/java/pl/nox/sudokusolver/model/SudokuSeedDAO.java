@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class SudokuSeedDAO {
 
-    private static DBUtil dBUtil = new DBUtil("mysql:/localhost:3306", "root", "password", "NoxSudoku");
+    private static DBUtil dBUtil = new DBUtil("mysql://localhost:3306", "root", "password", "nox_sudoku");
     private static final String CREATE = "INSERT INTO sudokus VALUES (null, ?, ?);";
     private static final String CREATE_SOLUTION = "INSERT INTO sudokus_solutions VALUES (null, ?, ?);";
     private static final String COUNT_BY_DIFFICULTY = "SELECT COUNT(*) FROM sudokus WHERE difficulty = ?;";

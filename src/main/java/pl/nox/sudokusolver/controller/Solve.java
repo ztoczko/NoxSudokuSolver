@@ -1,5 +1,6 @@
 package pl.nox.sudokusolver.controller;
 
+import org.apache.commons.lang3.StringUtils;
 import pl.nox.sudokusolver.model.Sudoku;
 import pl.nox.sudokusolver.model.SudokuSeedDAO;
 
@@ -12,38 +13,43 @@ import java.io.IOException;
 public class Solve extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setAttribute("page", 2);
         getServletContext().getRequestDispatcher("/WEB-INF/jsp/solve.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        request.setAttribute("page", 2);
         String[] numbers = request.getParameterValues("fieldValue");
+        for (int i = 0; i < numbers.length; i++) {
+            if (numbers[i] != null && numbers[i].isEmpty()) {
+                numbers[i] = "0";
+            }
+        }
         String bruteForce = request.getParameter("bruteForce");
+        String baseSeed = request.getParameter("seed");
         String solveAttempt = "fail";
         boolean quickSolution = false;
         boolean isError = false;
         String solution = new String();
-        if (numbers.length == 1 && numbers[0].matches("\\d{3}[1-5][1-9]{9}[0-3]{2}\\d{81}")) {
-            solution = SudokuSeedDAO.readSolutionById(Integer.parseInt(numbers[0].substring(0, 3)));
+        String fieldSeed = new String();
+
+        if (baseSeed != null && baseSeed.matches("\\d{3}[1-5][1-9]{9}[0-3]{2}\\d{81}")) {
+            solution = SudokuSeedDAO.readSolutionById(Integer.parseInt(baseSeed.substring(0, 3)));
             if (solution != null) {
-                solution = Sudoku.randomizeFieldsSeed(solution, numbers[0].substring(4, 15));
+                solution = Sudoku.randomizeFieldsSeed(solution, baseSeed.substring(4, 15));
                 quickSolution = true;
                 solveAttempt = "success";
                 request.setAttribute("solution", solution);
-            } else {
-                String temp = numbers[0];
-                numbers = new String[81];
-                for (int i = 0; i < 81; i++) {
-                    numbers[i] = temp.substring(i, i + 1);
-                }
             }
         }
-        if (!quickSolution && numbers.length != 81) {
+        if (numbers.length != 81) {
             isError = true;
         }
         if (!quickSolution && !isError) {
             for (String str : numbers) {
+                fieldSeed += str;
                 if (!str.matches("\\d")) {
                     isError = true;
                     break;
@@ -52,14 +58,11 @@ public class Solve extends HttpServlet {
         }
         if (!quickSolution && !isError) {
 
-            String fieldSeed = new String();
-            for (String str : numbers) {
-                fieldSeed += str;
-            }
             Sudoku sudoku = new Sudoku(fieldSeed);
             if (bruteForce == null) {
                 sudoku.reasoningSolve();
             } else {
+                request.setAttribute("bruteForce", "bruteForce");
                 sudoku.bruteForceSolve();
             }
             if (sudoku.getIsSolved()) {
@@ -70,8 +73,18 @@ public class Solve extends HttpServlet {
             }
             solution = sudoku.getSeed();
         }
+        if (isError) {
+            request.setAttribute("error", "error");
+        } else {
+            request.setAttribute("originalSeed", fieldSeed);
+        }
+        if (solveAttempt.equals("fail")) {
+            request.setAttribute("numbersMissing", StringUtils.countMatches(solution, '0'));
+        }
         request.setAttribute("solveAttempt", solveAttempt);
         request.setAttribute("solution", solution);
+//        System.out.println("Solution: " + solution);
+//        System.out.println(solveAttempt);
         getServletContext().getRequestDispatcher("/WEB-INF/jsp/solve.jsp").forward(request, response);
     }
 }

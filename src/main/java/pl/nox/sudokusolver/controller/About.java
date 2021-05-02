@@ -10,7 +10,8 @@ public class About extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        getServletContext().getRequestDispatcher("/WEB-INF/jsp/about.jsp");
+        request.setAttribute("page", 3);
+        getServletContext().getRequestDispatcher("/WEB-INF/jsp/about.jsp").forward(request, response);
     }
 
     @Override

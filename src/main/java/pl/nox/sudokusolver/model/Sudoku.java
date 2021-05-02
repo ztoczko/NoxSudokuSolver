@@ -10,9 +10,8 @@ import java.util.Set;
 
 public class Sudoku {
 
-    public SudokuField[][] fields; //change to private after test phase
+    private SudokuField[][] fields; //change to private after test phase
     private boolean isSolved;
-
 
     public boolean isInvalid() {
         return invalid;
@@ -123,7 +122,10 @@ public class Sudoku {
         String result = new String();
         List<Integer> tempSeed = new ArrayList<>();
         List<Integer> tempSeed2 = new ArrayList<>();
-
+        System.out.println("randomizer");
+        System.out.println(randomizer);
+        System.out.println(fieldsSeed);
+        System.out.println(fieldsSeed.length());
 
         for (int i = 0; i < 81; i++) {
             tempSeed.add(fieldsSeed.substring(i, i + 1).equals("0") ? 0 : randomizer.get(Integer.valueOf(fieldsSeed.substring(i, i + 1)) - 1));
