@@ -101,7 +101,12 @@ a.selected {
 }
 
 
-
+.modalText {
+    text-align: justify;
+    text-justify: inter-word;
+    padding: 1rem;
+    font-size: 1.5rem !important;
+}
 
 .button::-moz-focus-inner{
     border: 0;

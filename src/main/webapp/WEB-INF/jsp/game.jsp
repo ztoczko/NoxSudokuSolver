@@ -13,8 +13,10 @@
         <div class="d-flex flex-column justify-content-center align-items-center m-3 counter"
              style="overflow: auto; height: 20%; min-height: 0;">
             <%--            timer--%>
-            <span class="counter"><span id="hour">00</span>:<span id="minutes">00</span>:<span
-                    id="seconds">00</span></span>
+            <span class="counter"><span
+                    id="hour">${loadedGame != null ? loadedGame.substring(96, 98) : "00"}</span>:<span
+                    id="minutes">${loadedGame != null ? loadedGame.substring(98, 100) : "00"}</span>:<span
+                    id="seconds">${loadedGame != null ? loadedGame.substring(100, 102) : "00"}</span></span>
         </div>
 
         <div class="m-0 px-2 py-3 d-flex flex-column align-items-center"
@@ -25,14 +27,14 @@
             <button type="button" id="save" ${baseSeed == null ? "disabled" : ""} class="button red my-3"
                     style="width: 80%;">Zapisz grę
             </button>
-            <button type="button" class="button red my-3" data-bs-toggle="modal" data-bs-target="#loadGame"
+            <button type="button" id="load" class="button red my-3" data-bs-toggle="modal" data-bs-target="#loadGame"
                     style="width: 80%;">Wczytaj grę
             </button>
-            <!--MODAL DO WYBORU GRY!! DISABLED JEŚLI NIE MA CIASTECZEK-->
             <form action="/solve" method="post"
                   class="m-0, p-0 d-flex flex-column justify-content-center align-items-center"
                   style="width: 100%; margin-bottom: 0;">
-                <button type="submit" name="seed" value="${baseSeed}" id="load" ${baseSeed == null ? "disabled" : ""} class="button red my-3"
+                <button type="submit" name="seed" value="${baseSeed}" id="solve" ${baseSeed == null ? "disabled" : ""}
+                        class="button red my-3"
                         style="width: 80%;">Rozwiąż
                 </button>
                 <%--            </form>--%>
@@ -47,6 +49,25 @@
          style="height: 100%; overflow: auto">
 
         <%--        <form>--%>
+        <div class="py-3">
+            <c:choose>
+                <c:when test="${error != null}">
+                    <span class="text-danger fw-bold"> Przesyłane dane były niepoprawne</span>
+                </c:when>
+<%--                <c:when test="${error == null && \"invalid\".equals(solveAttempt)}">--%>
+<%--                    <span class="text-danger fw-bold"> Sudoku nie ma rozwiązania</span>--%>
+<%--                </c:when>--%>
+<%--                <c:when test="${error == null && \"fail\".equals(solveAttempt)}">--%>
+<%--                    <span class="text-danger fw-bold"> Nie udało się rozwiązać sudoku poprzez rozumowanie - możesz spróbować backtrackingu</span>--%>
+<%--                </c:when>--%>
+<%--                <c:when test="${error == null && \"success\".equals(solveAttempt) && bruteForce == null}">--%>
+<%--                    <span class="text-success fw-bold">Znaleziono następujące jedyne rozwiązanie:</span>--%>
+<%--                </c:when>--%>
+<%--                <c:when test="${error == null && \"success\".equals(solveAttempt) && bruteForce != null}">--%>
+<%--                    <span class="text-success fw-bold">Znaleziono następujące rozwiązanie - może nie być unikatowe:</span>--%>
+<%--                </c:when>--%>
+            </c:choose>
+        </div>
         <table class="sudokuTable">
             <c:forEach begin="0" end="8" var="row">
                 <tr>
@@ -54,19 +75,20 @@
 
                         <td>
                             <input type="text"
-                                   name="fieldValue" ${baseSeed == null || !baseSeed.substring(row * 9 + column + 15, row * 9 + column + 16).equals("0") ? "readonly" : ""}
+                                   name="fieldValue" ${error != null || baseSeed == null || !baseSeed.substring(row * 9 + column + 15, row * 9 + column + 16).equals("0") ? "readonly" : ""}
                             <c:choose>
-<%--                            value from base seed if there is any--%>
-                            <c:when test="${baseSeed != null && !baseSeed.substring(row * 9 + column + 15, row * 9 + column + 16).equals(\"0\")}">
+                                <%--                            value from base seed if there is any--%>
+                            <c:when test="${error != null || baseSeed != null && !baseSeed.substring(row * 9 + column + 15, row * 9 + column + 16).equals(\"0\")}">
                                    value="${baseSeed.substring(row * 9 + column + 15, row * 9 + column + 16)}"
                             </c:when>
-<%--                                    value from loaded game if there is any and is not filled by base seed--%>
-                            <c:when test="${baseSeed != null && loadedGame != null && baseSeed.substring(row * 9 + column + 15, row * 9 + column + 16).equals(\"0\") && !loadedGame.substring(row * 9 + column + 15, row * 9 + column + 16).equals(\"0\")}">
-                                    value="${loadedGame.substring(row * 9 + column + 15, row * 9 + column + 16)}"
+                                <%--                                    value from loaded game if there is any and is not filled by base seed--%>
+                            <c:when test="${error != null || baseSeed != null && loadedGame != null && baseSeed.substring(row * 9 + column + 15, row * 9 + column + 16).equals(\"0\") && !loadedGame.substring(row * 9 + column + 15, row * 9 + column + 16).equals(\"0\")}">
+                                   value="${loadedGame.substring(row * 9 + column + 15, row * 9 + column + 16)}"
                             </c:when>
                             </c:choose>
 
-                                   data-row="${row}" data-column="${column}" data-box="${(row -  row % 3)/ 3 * 3 + (column - column % 3) / 3}">
+                                   data-row="${row}" data-column="${column}"
+                                   data-box="${(row -  row % 3)/ 3 * 3 + (column - column % 3) / 3}">
 
                         </td>
                     </c:forEach>
@@ -92,9 +114,10 @@
                         <select class="form-select" name="gameToLoad">
                             <option value="" selected>...</option>
                             <c:forEach var="cookieItem" items="${cookie}">
+                                <%--                                <p> ${cookieItem.key.concat(cookieItem.key.contains(\"save\"))} </p>--%>
                                 <c:if test="${cookieItem.key.contains(\"save\")}">
                                     <%--                                    nazwa savów : save**--%>
-                                    <option value=${cookieItem.key}>${cookieItem.key.substring(5)} </option>
+                                    <option value=${cookieItem.key}>${cookieItem.key.substring(4)} </option>
                                 </c:if>
                             </c:forEach>
                         </select>

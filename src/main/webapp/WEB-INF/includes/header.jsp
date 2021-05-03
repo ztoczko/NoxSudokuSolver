@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,6 +12,11 @@
 <body>
 <script type="text/javascript">
     var page = ${page};
+    var gamePlayed = null;
+    <c:if test="${baseSeed != null}">
+    gamePlayed = "true";
+    var baseSeed = "${baseSeed}";
+    </c:if>
 </script>
 <div class="container-fluid p-0 m-0" style="min-height: 100vh;">
     <div class="row p-0 m-0" style="height: 20vh; width: 100%;">

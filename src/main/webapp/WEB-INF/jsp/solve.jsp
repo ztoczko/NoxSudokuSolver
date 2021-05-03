@@ -23,7 +23,7 @@
                 <%--                        style="width: 80%;">Rozwiąż--%>
                 <%--                </button>--%>
                 <%--            </form>--%>
-                <button type="submit" class="button red my-3"
+                <button type="submit" id="solve" class="button red my-3"
                         style="width: 80%; ${error != null || solveAttempt != null ? "display: none;" : ""} ">Rozwiąż
                 </button>
                 <button type="button" class="button red my-3" data-bs-toggle="modal" data-bs-target="#bruteForceModal"

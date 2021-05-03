@@ -1,5 +1,49 @@
 
 
+<%--modal cookie--%>
+<div class="modal fade" id="checkCookiePermission" tabindex="-1" aria-labelledby="checkCookiePermission" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-body">
+
+                <p class="modalText">Strona używa ciasteczek w celu przechowywania zapisanych gier oraz przechowywania ustawień użytkownika</p>
+                <p class="modalText">Czy chcesz zezwolić na przechowywanie ciasteczek?</p>
+
+                    <div class="d-flex flex-row justify-content-evenly">
+                        <button type="button" id="cookiesYes" class="button red m-3" style="width: 35%;" data-bs-dismiss="modal">
+                            Tak
+                        </button>
+                        <button type="button" id="cookiesNo" class="button red m-3" style="width: 35%;" data-bs-dismiss="modal">
+                            Nie
+                        </button>
+<%--                        <button type="button" class="button red m-3" data-bs-dismiss="modal">Zamknij</button>--%>
+                    </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<%--modal cookie--%>
+<div class="modal fade" id="victoryModal" tabindex="-1" aria-labelledby="victoryModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-body">
+
+                <p class="modalText" id="victoryModalText">Lorem ipsum</p>
+
+                <div class="d-flex flex-row justify-content-evenly">
+                    <button type="button" id="cookiesYes" class="button red m-3" style="width: 35%;" data-bs-dismiss="modal">
+                        Super
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="row p-0 m-0" style="height: 3vh; overflow: auto">
     <div class="col-12 p-0 m-0 d-flex justify-content-center align-items-center">
