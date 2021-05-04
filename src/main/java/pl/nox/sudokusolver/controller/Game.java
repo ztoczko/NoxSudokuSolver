@@ -23,6 +23,7 @@ public class Game extends HttpServlet {
         request.setAttribute("page", 1);
         boolean isParameterError = false;
         String type = request.getParameter("type");
+        String baseSeed = new String();
         if (type == null || !(type.equals("load") || type.equals("new"))) {
             isParameterError = true;
         }
@@ -31,12 +32,12 @@ public class Game extends HttpServlet {
             if (difficulty == null || !difficulty.matches("[1-5]")) {
                 isParameterError = true;
             } else {
-                String seed = Sudoku.generateRandomSudokuSeed(Integer.parseInt(difficulty));
-                if (seed == null) {
+                baseSeed = Sudoku.generateRandomSudokuSeed(Integer.parseInt(difficulty));
+                if (baseSeed == null) {
                     isParameterError = true;
                 } else {
 //                    Sudoku sudoku = new Sudoku(seed.substring(15));
-                    request.setAttribute("baseSeed", seed);
+                    request.setAttribute("baseSeed", baseSeed);
                 }
             }
         }
@@ -55,7 +56,7 @@ public class Game extends HttpServlet {
             if (!cookieFound || !loadedGame.matches("\\d{3}[1-5][1-9]{9}[0-3]{2}\\d{87}") || loadedGame.substring(4, 13).matches(".*(\\d).*\\1.*")) {
                 isParameterError = true;
             } else {
-                String baseSeed = SudokuSeedDAO.readById(Integer.parseInt(loadedGame.substring(0, 3)));
+                baseSeed = SudokuSeedDAO.readById(Integer.parseInt(loadedGame.substring(0, 3)));
                 if (baseSeed == null) {
                     isParameterError = true;
                 } else {
@@ -68,6 +69,16 @@ public class Game extends HttpServlet {
         }
         if (isParameterError) {
             request.setAttribute("error", "parameterError");
+        } else {
+            String solution = SudokuSeedDAO.readSolutionById(Integer.parseInt(baseSeed.substring(0, 3)));
+            if (solution != null) {
+                solution = Sudoku.randomizeFieldsSeed(solution, baseSeed.substring(4, 15));
+                request.setAttribute("solution", solution);
+            } else {
+                Sudoku sudoku = new Sudoku(baseSeed.substring(15));
+                sudoku.reasoningSolve();
+                request.setAttribute("solution", sudoku.getSeed());
+            }
         }
         getServletContext().getRequestDispatcher("/WEB-INF/jsp/game.jsp").forward(request, response);
     }

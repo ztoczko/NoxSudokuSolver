@@ -30,6 +30,9 @@
             <button type="button" id="load" class="button red my-3" data-bs-toggle="modal" data-bs-target="#loadGame"
                     style="width: 80%;">Wczytaj grę
             </button>
+            <button type="button" id="sudokuHint" ${baseSeed == null ? "disabled" : ""} class="button red my-3"
+                    style="width: 80%;"> Podpowiedź
+            </button>
             <form action="/solve" method="post"
                   class="m-0, p-0 d-flex flex-column justify-content-center align-items-center"
                   style="width: 100%; margin-bottom: 0;">
@@ -45,7 +48,7 @@
         </div>
 
     </div>
-    <div class="col-9 col-lg-8 p-4 d-flex flex-column justify-content-center align-items-center"
+    <div class="col-7 p-4 d-flex flex-column justify-content-center align-items-center"
          style="height: 100%; overflow: auto">
 
         <%--        <form>--%>
@@ -54,18 +57,18 @@
                 <c:when test="${error != null}">
                     <span class="text-danger fw-bold"> Przesyłane dane były niepoprawne</span>
                 </c:when>
-<%--                <c:when test="${error == null && \"invalid\".equals(solveAttempt)}">--%>
-<%--                    <span class="text-danger fw-bold"> Sudoku nie ma rozwiązania</span>--%>
-<%--                </c:when>--%>
-<%--                <c:when test="${error == null && \"fail\".equals(solveAttempt)}">--%>
-<%--                    <span class="text-danger fw-bold"> Nie udało się rozwiązać sudoku poprzez rozumowanie - możesz spróbować backtrackingu</span>--%>
-<%--                </c:when>--%>
-<%--                <c:when test="${error == null && \"success\".equals(solveAttempt) && bruteForce == null}">--%>
-<%--                    <span class="text-success fw-bold">Znaleziono następujące jedyne rozwiązanie:</span>--%>
-<%--                </c:when>--%>
-<%--                <c:when test="${error == null && \"success\".equals(solveAttempt) && bruteForce != null}">--%>
-<%--                    <span class="text-success fw-bold">Znaleziono następujące rozwiązanie - może nie być unikatowe:</span>--%>
-<%--                </c:when>--%>
+                <%--                <c:when test="${error == null && \"invalid\".equals(solveAttempt)}">--%>
+                <%--                    <span class="text-danger fw-bold"> Sudoku nie ma rozwiązania</span>--%>
+                <%--                </c:when>--%>
+                <%--                <c:when test="${error == null && \"fail\".equals(solveAttempt)}">--%>
+                <%--                    <span class="text-danger fw-bold"> Nie udało się rozwiązać sudoku poprzez rozumowanie - możesz spróbować backtrackingu</span>--%>
+                <%--                </c:when>--%>
+                <%--                <c:when test="${error == null && \"success\".equals(solveAttempt) && bruteForce == null}">--%>
+                <%--                    <span class="text-success fw-bold">Znaleziono następujące jedyne rozwiązanie:</span>--%>
+                <%--                </c:when>--%>
+                <%--                <c:when test="${error == null && \"success\".equals(solveAttempt) && bruteForce != null}">--%>
+                <%--                    <span class="text-success fw-bold">Znaleziono następujące rozwiązanie - może nie być unikatowe:</span>--%>
+                <%--                </c:when>--%>
             </c:choose>
         </div>
         <table class="sudokuTable">
@@ -74,7 +77,7 @@
                     <c:forEach begin="0" end="8" var="column">
 
                         <td>
-                            <input type="text"
+                            <input class="topElement" type="text"
                                    name="fieldValue" ${error != null || baseSeed == null || !baseSeed.substring(row * 9 + column + 15, row * 9 + column + 16).equals("0") ? "readonly" : ""}
                             <c:choose>
                                 <%--                            value from base seed if there is any--%>
@@ -89,6 +92,23 @@
 
                                    data-row="${row}" data-column="${column}"
                                    data-box="${(row -  row % 3)/ 3 * 3 + (column - column % 3) / 3}">
+                            <div class="bottomElement container-fluid possibilitiesTable" id="possibilities" style="overflow: auto;">
+                                <div class="row" style="height: calc(100% / 3)">
+                                    <div class="col-4" data-field="${row * 9 + column}" data-number="1">1</div>
+                                    <div class="col-4" data-field="${row * 9 + column}" data-number="2">2</div>
+                                    <div class="col-4" data-field="${row * 9 + column}" data-number="3">3</div>
+                                </div>
+                                <div class="row" style="height: calc(100% / 3)">
+                                    <div class="col-4" data-field="${row * 9 + column}" data-number="4">4</div>
+                                    <div class="col-4" data-field="${row * 9 + column}" data-number="5">5</div>
+                                    <div class="col-4" data-field="${row * 9 + column}" data-number="6">6</div>
+                                </div>
+                                <div class="row" style="height: calc(100% / 3)">
+                                    <div class="col-4" data-field="${row * 9 + column}" data-number="7">7</div>
+                                    <div class="col-4" data-field="${row * 9 + column}" data-number="8">8</div>
+                                    <div class="col-4" data-field="${row * 9 + column}" data-number="9">9</div>
+                                </div>
+                            </div>
 
                         </td>
                     </c:forEach>
@@ -98,7 +118,16 @@
         </form>
         <div>${baseSeed}</div>
     </div>
-    <div class="col-lg-1"></div>
+    <div class="col-2 d-flex justify-content-center align-items-center">
+        <div class="possibilities" id="possibilitiesBox">
+            <c:forEach var="buttonNo" begin="1" end="9">
+                <button class="button green possibleButton" id="${"possibility".concat(buttonNo)}" data-row="${row}" data-column="${column}">
+                        ${buttonNo}
+                </button>
+            </c:forEach>
+        </div>
+
+    </div>
 
     <!-- Modal -->
     <div class="modal fade" id="loadGame" tabindex="-1" aria-labelledby="loadGame" aria-hidden="true">
@@ -111,7 +140,7 @@
                 <div class="modal-body">
                     <form method="post" class="my-3 d-flex flex-column justify-content-center align-items-center"
                           style="width: 100%;">
-                        <select class="form-select" name="gameToLoad">
+                        <select id="loadMenu" class="form-select" name="gameToLoad">
                             <option value="" selected>...</option>
                             <c:forEach var="cookieItem" items="${cookie}">
                                 <%--                                <p> ${cookieItem.key.concat(cookieItem.key.contains(\"save\"))} </p>--%>

@@ -65,6 +65,7 @@ a.selected {
     height: 7vmin;
     /*line-height: 10vmin;*/
     /*height: 100px;*/
+    position: relative;
 }
 
 .sudokuTable td[data-row="1"][data-column="2"] {
@@ -100,7 +101,6 @@ a.selected {
     font-size: 3rem;
 }
 
-
 .modalText {
     text-align: justify;
     text-justify: inter-word;
@@ -112,6 +112,88 @@ a.selected {
     border: 0;
     padding: 0;
 }
+
+.topElement {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0.7;
+    z-index: 2;
+}
+
+.topElementSolid {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 1;
+    z-index: 2;
+}
+
+
+.bottomElement {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 1;
+    z-index: 1;
+    overflow: auto;
+}
+
+.possibilities {
+    min-width: 11vw;
+    max-width: 11vw;
+    min-height: 11vw;
+    max-height: 11vw;
+    display: flex;
+    justify-content: space-around;
+    align-content: space-around;
+    flex-wrap: wrap;
+    overflow: auto;
+}
+
+.possibleButton {
+    width: 3vw;
+    height: 3vw;
+}
+
+.hide {
+    display: none;
+}
+
+.possibilitiesTable {
+    table-layout:fixed;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 7vmin;
+    overflow: auto;
+}
+
+.possibilitiesTable .row {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 2vmin;
+}
+
+.possibilitiesTable .col-4 {
+    margin: 0;
+    padding: 0;
+    font-size: 0.8rem;
+}
+
 
 .button{
     display: inline-block;
@@ -171,6 +253,7 @@ a.selected {
     -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .3) inset;
     box-shadow: 0 1px 1px rgba(0, 0, 0, .3) inset;
 }
+
 
 .button[disabled], .button[disabled]:hover, .button[disabled]:active{
     border-color: #eaeaea;
@@ -246,6 +329,12 @@ a.selected {
     background: #c43c35;
 }
 
+.button
+
+.button.red:active{
+    background: #c43c35;
+}
+
 /* */
 
 .button.blue{
@@ -315,7 +404,7 @@ a.selected {
     border-radius: 0;
 }
 
-.button-group .button:active{
+.button-group .button :active{
     -moz-box-shadow: 0 0 1px rgba(0, 0, 0, .2) inset, 5px 0 5px -3px rgba(0, 0, 0, .2) inset, -5px 0 5px -3px rgba(0, 0, 0, .2) inset;
     -webkit-box-shadow: 0 0 1px rgba(0, 0, 0, .2) inset, 5px 0 5px -3px rgba(0, 0, 0, .2) inset, -5px 0 5px -3px rgba(0, 0, 0, .2) inset;
     box-shadow: 0 0 1px rgba(0, 0, 0, .2) inset, 5px 0 5px -3px rgba(0, 0, 0, .2) inset, -5px 0 5px -3px rgba(0, 0, 0, .2) inset;
@@ -343,4 +432,9 @@ a.selected {
     -moz-box-shadow: 0 0 1px rgba(0, 0, 0, .2) inset, 5px 0 5px -3px rgba(0, 0, 0, .2) inset;
     -webkit-box-shadow: 0 0 1px rgba(0, 0, 0, .2) inset, 5px 0 5px -3px rgba(0, 0, 0, .2) inset;
     box-shadow: 0 0 1px rgba(0, 0, 0, .2) inset, 5px 0 5px -3px rgba(0, 0, 0, .2) inset;
+}
+
+.clicked {
+    color: red;
+    background-color: #ca3535;
 }

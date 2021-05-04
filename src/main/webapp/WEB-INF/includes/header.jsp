@@ -13,9 +13,19 @@
 <script type="text/javascript">
     var page = ${page};
     var gamePlayed = null;
+    var baseSeed = null;
+    var solveAttempt = null;
+    var originalSeed = null;
+    var solution = null;
     <c:if test="${baseSeed != null}">
     gamePlayed = "true";
-    var baseSeed = "${baseSeed}";
+    baseSeed = "${baseSeed}";
+    solution = "${solution}";
+    </c:if>
+    <c:if test="${solveAttempt != null}">
+        solveAttempt = "${solveAttempt}";
+        originalSeed = "${originalSeed}";
+        solution = "${solution}";
     </c:if>
 </script>
 <div class="container-fluid p-0 m-0" style="min-height: 100vh;">

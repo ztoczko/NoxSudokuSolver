@@ -30,12 +30,13 @@
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
 
-            <div class="modal-body">
+            <div class="modal-body d-flex flex-column justify-content-center align-items-center" style="width: 100%;">
 
+                <img src="../../img/steven.webp"/>
                 <p class="modalText" id="victoryModalText">Lorem ipsum</p>
 
-                <div class="d-flex flex-row justify-content-evenly">
-                    <button type="button" id="cookiesYes" class="button red m-3" style="width: 35%;" data-bs-dismiss="modal">
+                <div class="d-flex flex-row justify-content-evenly" style="width: 100%;">
+                    <button type="button" class="button red m-3" style="width: 35%;" data-bs-dismiss="modal">
                         Super
                     </button>
                 </div>

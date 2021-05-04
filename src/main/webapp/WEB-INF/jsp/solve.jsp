@@ -70,7 +70,7 @@
                                    name="fieldValue" ${solveAttempt != null || error != null ? "readonly" : ""}
 
                                 <%--                            value from base seed if there is any--%>
-                            <c:if test="${solveAttempt != null && error == null && !solution.substring(row * 9 + column, row * 9 + column + 1).equals(\"0\")}">
+                            <c:if test="${solveAttempt != null && error == null && !originalSeed.substring(row * 9 + column, row * 9 + column + 1).equals(\"0\")}">
                                    value="${solution.substring(row * 9 + column, row * 9 + column + 1)}"
                             </c:if>
 

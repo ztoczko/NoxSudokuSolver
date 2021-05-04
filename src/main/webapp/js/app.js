@@ -4,6 +4,11 @@ const xx = '${page}';
 console.log(xx);
 console.log(page);
 let timer;
+// create starting table for all number possibilities for each field
+const possibilities = [];
+for (let i = 0; i < 81; i++) {
+    possibilities.push([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+}
 
 function isEmpty(strIn) {
     if (strIn === undefined) {
@@ -83,21 +88,62 @@ function createConflict(baseElement, secondElement) {
 }
 
 function checkIfConflictExists() {
-    return !document.querySelector(".sudokuTable input[data-conflict]") == null;
+    return document.querySelector(".sudokuTable input[data-conflict]") != null;
 }
 
-function runCheck() {
-    console.log("run");
+function displayPossibilitiesButtonsEvent() {
+    displayPossibilitiesButtons(this.dataset.row, this.dataset.column);
+}
+
+function displayPossibilitiesButtons(row, column) {
+
+    const possibilityArray = possibilities[parseInt(row) * 9 + parseInt(column)];
+    document.getElementById("possibilitiesBox").classList.remove("hide");
+    document.querySelectorAll(".possibleButton").forEach((item, index) => {
+        item.dataset.field = (parseInt(row) * 9 + parseInt(column)).toString();
+        item.classList.remove("bg-secondary");
+        if (!possibilityArray.includes(parseInt(item.innerText))) {
+            item.classList.add("bg-secondary");
+        }
+    });
+    clearLines();
+    const possibilitiesElementCoords = document.getElementById("possibilitiesBox").getBoundingClientRect();
+    const thisCoords = document.querySelector("[data-row=\"" + row + "\"][data-column=\"" + column + "\"]").getBoundingClientRect();
+    document.body.appendChild(createLine(thisCoords.right, thisCoords.top, possibilitiesElementCoords.left, possibilitiesElementCoords.top));
+    document.body.appendChild(createLine(thisCoords.right, thisCoords.bottom, possibilitiesElementCoords.left, possibilitiesElementCoords.bottom));
+}
+
+function runFieldCheckOnChange() {
+
     let number = this.value;
 
+    // removepossibilities display
+    if (page == 1) {
+        if (!this.nextElementSibling.classList.contains("hide")) {
+            this.nextElementSibling.classList.add("hide");
+        }
+        clearLines();
+    }
+
 // find conflicts
-    if (!isEmpty(number) && !number.match("^[1-9]$")) {
+    if (isEmpty(number) || !number.match("^[1-9]$")) {
         this.value = "";
         console.log(this.value);
         number = undefined;
         console.log("wrong no");
+        if (this.classList.contains("topElementSolid")) {
+            this.classList.remove("topElementSolid");
+            this.classList.add("topElement");
+        }
+        this.nextElementSibling.classList.remove("hide")
+        displayPossibilitiesButtons(this.dataset.row, this.dataset.column);
     }
     if (!isEmpty(number)) {
+        document.getElementById("possibilitiesBox").classList.add("hide");
+        if (this.classList.contains("topElement")) {
+            this.classList.add("topElementSolid");
+            this.classList.remove("topElement");
+        }
         const table = document.querySelector(".sudokuTable");
         const value = this.value;
         const row = this.dataset.row;
@@ -145,15 +191,15 @@ function checkCompleteCondition() {
     if (document.querySelector("[data-conflict]") == null) {
         let complete = true;
         document.querySelectorAll(".sudokuTable input").forEach((item) => {
-           if (!item.value.match("^[1-9]$")) {
-               complete = false;
-           }
+            if (!item.value.match("^[1-9]$")) {
+                complete = false;
+            }
         });
         if (complete) {
             let i = 0;
             const fields = document.querySelectorAll(".sudokuTable input");
             fields.forEach((item) => {
-               item.readOnly = true;
+                item.readOnly = true;
             });
             if (page == 1) {
                 document.getElementById("save").disabled = true;
@@ -171,7 +217,7 @@ function checkCompleteCondition() {
                 if (i - 12 == fields.length) {
                     const victoryModal = new bootstrap.Modal(document.getElementById("victoryModal"));
                     document.getElementById("victoryModalText").innerText = page == 1 ? "Twój czas to " + document.getElementById("hour").innerText + ":" + document.getElementById("minutes").innerText + ":" + document.getElementById("seconds").innerText : "Chyba przypadkiem rozwiązałeś sudoku, które miał rozwiązać algorytm?";
-                        victoryModal.toggle();
+                    victoryModal.toggle();
                     clearInterval(victory);
                 }
                 i++
@@ -183,13 +229,21 @@ function checkCompleteCondition() {
 function resetGame() {
 
     document.querySelectorAll(".sudokuTable input").forEach((item, index) => {
-       item.removeAttribute("data-conflict");
-       if (baseSeed.substring(15 + index, 16 + index) == "0") {
-           item.removeAttribute("readonly");
-       }
-       if (!item.hasAttribute("readonly")) {
-           item.value = "";
-       }
+        item.removeAttribute("data-conflict");
+        item.classList.remove("bg-danger");
+        console.log(baseSeed.substring(15 + index, 16 + index));
+        if (baseSeed.substring(15 + index, 16 + index) == "0") {
+            item.removeAttribute("readonly");
+            if (item.classList.contains("topElementSolid")) {
+                item.classList.remove("topElementSolid");
+                item.classList.add("topElement");
+                item.nextElementSibling.classList.remove("hide");
+                console.log(item.nextElementSibling);
+            }
+        }
+        if (!item.hasAttribute("readonly")) {
+            item.value = "";
+        }
     });
     document.getElementById("solve").disabled = false;
     if (document.cookie.match("cookiePermission=yes")) {
@@ -201,19 +255,24 @@ function saveGame() {
 
     let saveSeed = baseSeed.substring(0, 15);
     document.querySelectorAll(".sudokuTable input").forEach((item) => {
-       saveSeed += item.value.match("^[1-9]$") ? item.value.toString() : "0";
+        saveSeed += item.value.match("^[1-9]$") ? item.value.toString() : "0";
     });
     saveSeed += document.getElementById("hour").innerText + document.getElementById("minutes").innerText + document.getElementById("seconds").innerText;
 
     const date = new Date();
     date.setTime(date.getTime());
     // let formatter = new Intl.DateTimeFormat('en', { year: 'numeric', month: 'numeric', day: 'numeric'}).format(date);
-    let dateStr = date.getFullYear() + "-" + (date.getMonth() < 9 ? "0" : "") + (date.getMonth() + 1) + "-" + (date.getDate() < 10 ? "0" : "") + date.getDate() + "_" + (date.getHours() < 10 ? "0" : "") + date.getHours() + "h" + (date.getMinutes() < 10 ? "0" : "") + date.getMinutes() + "m" + (date.getSeconds() < 10 ? "0" : "") + date.getSeconds() +"s";
+    let dateStr = date.getFullYear() + "-" + (date.getMonth() < 9 ? "0" : "") + (date.getMonth() + 1) + "-" + (date.getDate() < 10 ? "0" : "") + date.getDate() + "_" + (date.getHours() < 10 ? "0" : "") + date.getHours() + "h" + (date.getMinutes() < 10 ? "0" : "") + date.getMinutes() + "m" + (date.getSeconds() < 10 ? "0" : "") + date.getSeconds() + "s";
 
     // dateStr = dateStr.substring(dateStr.indexOf(",") + 1);
     // const dateArray = dateStr.split(" ");
     // dateStr = dateArray
     setCookie("save" + dateStr + "-seed-" + saveSeed.substring(0, 15), saveSeed, 365);
+
+    const newLoad = document.createElement("OPTION");
+    newLoad.setAttribute("value", "save" + dateStr + "-seed-" + saveSeed.substring(0, 15));
+    newLoad.innerText = dateStr + "-seed-" + saveSeed.substring(0, 15);
+    document.getElementById("loadMenu").appendChild(newLoad);
 }
 
 function setCookie(name, value, expiry) {
@@ -233,11 +292,138 @@ function getCookieValue(name) {
             cookies[i] = cookies[i].substring(1);
         }
         if (cookies[i].indexOf(name + "=") == 0) {
-            return cookies[i].substring(name.length +1);
+            return cookies[i].substring(name.length + 1);
         }
     }
     return null;
 }
+
+function displayHint() {
+
+    const emptyFields = [];
+    document.querySelectorAll(".sudokuTable input").forEach((item) => {
+        if (!item.value.match("^[1-9]$") || item.value != solution.substring(parseInt(item.dataset.row) * 9 + parseInt(item.dataset.column), parseInt(item.dataset.row) * 9 + parseInt(item.dataset.column) + 1)) {
+            console.log(item.value);
+            console.log(solution.substring(parseInt(item.dataset.row) * 9 + parseInt(item.dataset.column), parseInt(item.dataset.row) * 9 + parseInt(item.dataset.column) + 1));
+            emptyFields.push({row: item.dataset.row, column: item.dataset.column});
+        }
+    });
+    const chosenField = Math.floor(Math.random() * emptyFields.length);
+    const chosenElement = document.querySelector("[data-row=\"" + emptyFields[chosenField].row + "\"][data-column=\"" + emptyFields[chosenField].column + "\"]");
+    chosenElement.value = solution.substring(parseInt(emptyFields[chosenField].row) * 9 + parseInt(emptyFields[chosenField].column), parseInt(emptyFields[chosenField].row) * 9 + parseInt(emptyFields[chosenField].column) + 1);
+    console.log(solution.substring(emptyFields[chosenField].row * 9 + emptyFields[chosenField].column, emptyFields[chosenField].row * 9 + emptyFields[chosenField].column + 1));
+    console.log(solution);
+    console.log(emptyFields[chosenField].row * 9 + emptyFields[chosenField].column);
+    console.log(emptyFields);
+    chosenElement.classList.add("bg-primary");
+    chosenElement.dispatchEvent(new Event("change"));
+    const bgDelay = setTimeout(() => {
+        chosenElement.classList.remove("bg-primary");
+    }, 1000);
+    const hintButton = document.getElementById("sudokuHint");
+    hintButton.disabled = true;
+    let delayCounter = 30;
+    let buttonText = hintButton.innerText + " " + (delayCounter < 10 ? "0" : "") + delayCounter + "s";
+    hintButton.innerText = buttonText;
+    const hintDelay = setInterval(() => {
+        delayCounter--;
+        if (delayCounter > 0) {
+            buttonText = buttonText.substring(0, buttonText.length - 3) + (delayCounter < 10 ? "0" : "") + delayCounter + "s";
+        } else {
+            buttonText = buttonText.substring(0, buttonText.length - 4);
+        }
+        hintButton.innerText = buttonText;
+        if (delayCounter == 0) {
+            hintButton.disabled = false;
+            clearInterval(hintDelay);
+        }
+    }, 1000);
+
+}
+
+function clearLines() {
+    if (document.querySelector("[data-line]") != null) {
+        document.querySelectorAll("[data-line]").forEach((item) => {
+            item.parentElement.removeChild(item);
+        });
+    }
+}
+
+// drawing line (to possiblilities)
+function createLineElement(x, y, length, angle) {
+    let line = document.createElement("div");
+    let styles = 'border: 1px dashed orange; '
+        + 'width: ' + length + 'px; '
+        + 'height: 0px; '
+        + '-moz-transform: rotate(' + angle + 'rad); '
+        + '-webkit-transform: rotate(' + angle + 'rad); '
+        + '-o-transform: rotate(' + angle + 'rad); '
+        + '-ms-transform: rotate(' + angle + 'rad); '
+        + 'position: absolute; '
+        + 'top: ' + y + 'px; '
+        + 'left: ' + x + 'px; '
+        + 'opacity: 0.5;'
+        + 'z-index: 9;';
+    line.setAttribute('style', styles);
+    line.setAttribute("data-line", "1");
+    return line;
+}
+
+function createLine(x1, y1, x2, y2) {
+    let a = x1 - x2,
+        b = y1 - y2,
+        c = Math.sqrt(a * a + b * b);
+    let sx = (x1 + x2) / 2,
+        sy = (y1 + y2) / 2;
+    let x = sx - c / 2,
+        y = sy;
+    let alpha = Math.PI - Math.atan2(-b, a);
+    return createLineElement(x, y, c, alpha);
+}
+
+// toggling possible value for predetermined field
+function verifyButtonPossiblity() {
+
+    if (this.classList.contains("bg-secondary")) {
+        this.classList.remove("bg-secondary");
+        possibilities[parseInt(this.dataset.field)].push(this.innerText);
+        document.querySelector(".col-4[data-field=\"" + this.dataset.field + "\"][data-number=\"" + this.innerText + "\"]").innerText = this.innerText;
+        console.log(document.getElementById("possibility".concat(this.innerText)));
+    } else {
+        this.classList.add("bg-secondary");
+        document.querySelector(".col-4[data-field=\"" + this.dataset.field + "\"][data-number=\"" + this.innerText + "\"]").innerText = " ";
+        possibilities[parseInt(this.dataset.field)] = possibilities[parseInt(this.dataset.field)].filter((item) => {
+            return item != this.innerText;
+        });
+    }
+}
+
+//solve animation for auto-solve
+
+if (page == 2 && solveAttempt != null) {
+    window.addEventListener("load", () => {
+
+        const color = solveAttempt == "success" ? "#32CD32" : "#f0ad4e";
+        const fields = document.querySelectorAll(".sudokuTable input");
+        let i = 0;
+        let solutionDisplay = setInterval(() => {
+            if (i < fields.length) {
+                fields[i].setAttribute("style", "background-color: " + color + "; transition: background-color 0.5s");
+                if (originalSeed.substring(i, i + 1) == "0" && solution.substring(i, i + 1) != "0") {
+                    fields[i].value = solution.substring(i, i + 1);
+                }
+            }
+            if (i > 12) {
+                fields[i - 13].setAttribute("style", "background-color: f2f2f2; transition: background-color 0.5s");
+            }
+            if (i - 12 == fields.length) {
+                clearInterval(solutionDisplay);
+            }
+            i++;
+        }, 50);
+    });
+}
+
 
 // timer
 if (page == 1 && gamePlayed != null) {
@@ -263,10 +449,11 @@ if (page == 1 && gamePlayed != null) {
 // czy wszystko dać w window load??
 //porównywanie stringów
 
-//save i reset
+//save, hint i reset
 if (page == 1) {
     document.getElementById("save").addEventListener("click", saveGame);
     document.getElementById("sudokuReset").addEventListener("click", resetGame);
+    document.getElementById("sudokuHint").addEventListener("click", displayHint);
 
 }
 
@@ -289,15 +476,57 @@ window.addEventListener("load", () => {
     }
 
     if ("no" == getCookieValue("cookiePermission") && page == 1) {
-            document.getElementById("save").disabled = true;
-            document.getElementById("load").disabled = true;
-    };
+        document.getElementById("save").disabled = true;
+        document.getElementById("load").disabled = true;
+    }
+    ;
 });
 
-// document.getElementById("save").style.color = "pink";
-// document.getElementById("save").style.backgroundColor = "white";
+// remove possibilities display from disabled fields on load
+if (page == 1) {
+    window.addEventListener("load", () => {
+        document.querySelectorAll(".possibilitiesTable").forEach((item) => {
+            if (item.previousElementSibling.hasAttribute("readonly")) {
+                item.classList.add("hide");
+                item.previousElementSibling.classList.remove("topElement");
+                item.previousElementSibling.classList.add("topElementSolid");
+            }
+        });
+    });
+}
 
 //numbers validation
 document.querySelectorAll(".sudokuTable input").forEach((item) => {
-    item.addEventListener("change", runCheck);
+    item.addEventListener("change", runFieldCheckOnChange);
 });
+
+function createLinesToPossibilities() {
+    clearLines();
+    const possibilitiesElementCoords = document.getElementById("possibilitiesBox").getBoundingClientRect();
+    const thisCoords = this.getBoundingClientRect();
+    console.log(thisCoords.right, thisCoords.top, possibilitiesElementCoords.left, possibilitiesElementCoords.top);
+    document.body.appendChild(createLine(thisCoords.right, thisCoords.top, possibilitiesElementCoords.left, possibilitiesElementCoords.top));
+    document.body.appendChild(createLine(thisCoords.right, thisCoords.bottom, possibilitiesElementCoords.left, possibilitiesElementCoords.bottom));
+    displayPossibilitiesButtons(this.dataset.row, this.dataset.column);
+}
+
+
+// displaying possibilities after click
+if (page == 1) {
+    document.querySelectorAll(".sudokuTable input").forEach((item) => {
+        item.addEventListener("focus", displayPossibilitiesButtonsEvent);
+    });
+}
+
+
+// event handling for possibilities buttons
+
+if (page == 1) {
+    document.querySelectorAll(".possibleButton").forEach((item) => {
+        item.addEventListener("click", verifyButtonPossiblity);
+    });
+
+}
+
+
+// document.body.appendChild(createLine(100, 100, 200, 200));
