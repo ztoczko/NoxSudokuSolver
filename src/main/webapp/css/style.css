@@ -171,7 +171,14 @@ a.selected {
     font-size: 0.8rem;
 }
 
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 960px) {
+
+    .mainbody {
+        background-color: #f2f2f2;
+        height: auto;
+        width: 90%;
+        overflow: auto;
+    }
     .possibilities {
         min-width: 24vw;
         max-width: 24vw;

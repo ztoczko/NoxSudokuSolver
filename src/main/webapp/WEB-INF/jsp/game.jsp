@@ -7,7 +7,7 @@
 
 <div class="row mainbody m-0">
 
-    <div class="col-3 m-0 px-2 py-3 d-flex flex-column justify-content-center align-items-center"
+    <div class="col-lg-3 m-0 px-2 py-3 d-flex flex-column justify-content-center align-items-center"
          style="height: 100%;">
 
         <div class="d-flex flex-column justify-content-center align-items-center m-3 counter"
@@ -59,7 +59,7 @@
         </div>
 
     </div>
-    <div class="col-6 p-4 d-flex flex-column justify-content-center align-items-center"
+    <div class="col-lg-7 p-4 d-flex flex-column justify-content-center align-items-center"
          style="height: 100%; overflow: auto">
 
         <div class="py-3">
@@ -123,7 +123,7 @@
         </form>
 
     </div>
-    <div class="col-3 d-flex justify-content-center align-items-center">
+    <div class="col-lg-2 d-flex justify-content-center align-items-center">
         <%--                            possibilities button group - hidden by default, heavily modified through Javascript--%>
         <div class="possibilities hide" id="possibilitiesBox">
             <c:forEach var="buttonNo" begin="1" end="9">
