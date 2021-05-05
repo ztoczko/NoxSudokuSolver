@@ -98,7 +98,7 @@ a.selected {
     justify-self: start;
     /*align-self: start;*/
     /*width: 100%;*/
-    font-size: 3rem;
+    font-size: 2.5rem;
 }
 
 .modalText {
@@ -164,8 +164,33 @@ a.selected {
 }
 
 .possibleButton {
-    width: 3vw;
+    min-width: 3vw;
+    max-width: 3vw;
+    overflow: auto;
     height: 3vw;
+    font-size: 0.8rem;
+}
+
+@media screen and (max-width: 800px) {
+    .possibilities {
+        min-width: 24vw;
+        max-width: 24vw;
+        min-height: 24vw;
+        max-height: 24vw;
+        display: flex;
+        justify-content: space-around;
+        align-content: space-around;
+        flex-wrap: wrap;
+        overflow: auto;
+    }
+
+    .possibleButton {
+        min-width: 7vw;
+        max-width: 7vw;
+        overflow: auto;
+        height: 7vw;
+        font-size: 0.2rem;
+    }
 }
 
 .hide {

@@ -59,7 +59,7 @@
         </div>
 
     </div>
-    <div class="col-7 p-4 d-flex flex-column justify-content-center align-items-center"
+    <div class="col-6 p-4 d-flex flex-column justify-content-center align-items-center"
          style="height: 100%; overflow: auto">
 
         <div class="py-3">
@@ -78,7 +78,7 @@
                     <c:forEach begin="0" end="8" var="column">
                         <td>
 
-                            <input class="topElement" type="text"
+                            <input class="topElement" type="text" inputmode="numeric" pattern="[0-9]*"
                                 <%--                                  field is disabled if error was detected on backend or there is no game in progress (baseseed is null)--%>
                                    name="fieldValue" ${error != null || baseSeed == null || !baseSeed.substring(row * 9 + column + 15, row * 9 + column + 16).equals("0") ? "readonly" : ""}
                             <c:choose>
@@ -123,12 +123,11 @@
         </form>
 
     </div>
-    <div class="col-2 d-flex justify-content-center align-items-center">
+    <div class="col-3 d-flex justify-content-center align-items-center">
         <%--                            possibilities button group - hidden by default, heavily modified through Javascript--%>
         <div class="possibilities hide" id="possibilitiesBox">
             <c:forEach var="buttonNo" begin="1" end="9">
-                <button class="button green possibleButton" id="${"possibility".concat(buttonNo)}" data-row="${row}"
-                        data-column="${column}">
+                <button class="button green possibleButton" id="${"possibility".concat(buttonNo)}">
                         ${buttonNo}
                 </button>
             </c:forEach>

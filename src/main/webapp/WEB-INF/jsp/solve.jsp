@@ -65,7 +65,7 @@
                     <c:forEach begin="0" end="8" var="column">
 
                         <td>
-                            <input type="text"
+                            <input type="text" inputmode="numeric" pattern="[0-9]*"
                                    name="fieldValue" ${solveAttempt != null || error != null ? "readonly" : ""}
 
                                 <%--                            value from base seed if there is any--%>
