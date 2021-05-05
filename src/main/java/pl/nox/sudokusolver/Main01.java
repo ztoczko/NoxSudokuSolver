@@ -118,11 +118,11 @@ public class Main01 {
 
         System.out.println(sudoku);
 
-        List<Integer> list = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 3);
+//        List<Integer> list = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 3);
 
-        tempseed = Sudoku.randomizeFieldsSeed(tempseed, list);
-
-        sudoku = new Sudoku(tempseed);
+//        tempseed = Sudoku.randomizeFieldsSeed(tempseed, list);
+//
+//        sudoku = new Sudoku(tempseed);
 
         System.out.println(sudoku);
 
