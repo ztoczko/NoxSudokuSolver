@@ -32,7 +32,7 @@
 </script>
 
 <%--topbar--%>
-<div class="container-fluid p-0 m-0" style="min-height: 100vh;">
+<div class="container-fluid p-0 m-0" style="min-height: 100vh; background-color: #f2f2f2;">
     <div class="row p-0 m-0" style="height: 20vh; width: 100%;">
         <div class="col-12 topbar d-flex justify-content-center align-items-end"> <!--dodać buttony z językami!!-->
             <div class="row" style="width: 100%;">
