@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class SudokuSeedDAO {
 
-    private static DBUtil dBUtil = new DBUtil("mysql://localhost:3306", "root", "password", "nox_sudoku");
+    private static DBUtil dBUtil = new DBUtil("mysql://remotemysql.com:3306", "TraDU2ybRx", "q9FIzRp9bp", "TraDU2ybRx");
     private static final String CREATE = "INSERT INTO sudokus VALUES (null, ?, ?);";
     private static final String CREATE_SOLUTION = "INSERT INTO sudokus_solutions VALUES (null, ?, ?);";
     private static final String COUNT_BY_DIFFICULTY = "SELECT COUNT(*) FROM sudokus WHERE difficulty = ?;";
@@ -16,7 +16,7 @@ public class SudokuSeedDAO {
     private static final String READ_SOLUTION_BY_ID = "SELECT * FROM sudokus_solutions WHERE sudoku_id = ?";
     private static final String READ_RANDOM_BY_DIFFICULTY = "SELECT * FROM sudokus WHERE difficulty = ? LIMIT ?, 1;";
 
-
+    //creating new sudoku seed record
     public static boolean create(int difficulty, String shortSeed) {
 
         try (Connection conn = dBUtil.connect(); PreparedStatement ps = conn.prepareStatement(CREATE)) {
@@ -32,6 +32,7 @@ public class SudokuSeedDAO {
         return false;
     }
 
+    //creating new sudoku solution seed record
     public static boolean createSolution(int sudokuId, String shortSeed) {
 
         try (Connection conn = dBUtil.connect(); PreparedStatement ps = conn.prepareStatement(CREATE_SOLUTION)) {
@@ -47,6 +48,7 @@ public class SudokuSeedDAO {
         return false;
     }
 
+    //counting number of seeds of predetermined difficulty
     public static int countByDifficulty(int difficulty) {
 
         try (Connection conn = dBUtil.connect(); PreparedStatement ps = conn.prepareStatement(COUNT_BY_DIFFICULTY)) {
@@ -66,6 +68,7 @@ public class SudokuSeedDAO {
         return -1;
     }
 
+    //loading seed of given id
     public static String readById(int id) {
 
         try (Connection conn = dBUtil.connect(); PreparedStatement ps = conn.prepareStatement(READ_BY_ID)) {
@@ -85,6 +88,7 @@ public class SudokuSeedDAO {
         return null;
     }
 
+    //loading solution seed of given id
     public static String readSolutionById(int sudoku_id) {
 
         try (Connection conn = dBUtil.connect(); PreparedStatement ps = conn.prepareStatement(READ_SOLUTION_BY_ID)) {
@@ -104,6 +108,7 @@ public class SudokuSeedDAO {
         return null;
     }
 
+    //loading random sudoku seed of given difficulty
     public static String randomByDifficulty(int difficulty) {
 
         try (Connection conn = dBUtil.connect(); PreparedStatement ps = conn.prepareStatement(READ_RANDOM_BY_DIFFICULTY)) {

@@ -12,20 +12,16 @@
 
         <div class="m-0 px-2 py-3 d-flex flex-column align-items-center"
              style="height: 80%; width: 100%; overflow: auto; min-height: 0;">
-            <%--            <button type="button" class="button red my-3" data-bs-toggle="modal" data-bs-target="#newGame"--%>
-            <%--                    style="width: 80%;">Nowa gra--%>
-            <%--            </button>--%>
 
+            <%--            menu buttons for solve subpage - backtracking is only available when procedural solve fails--%>
             <form method="post"
                   class="m-0, p-0 d-flex flex-column justify-content-center align-items-center"
                   style="width: 100%; margin-bottom: 0;">
-                <%--                <button type="submit" id="load" ${baseSeed == null ? "disabled" : ""} class="button red my-3"--%>
-                <%--                        style="width: 80%;">Rozwiąż--%>
-                <%--                </button>--%>
-                <%--            </form>--%>
+
                 <button type="submit" id="solve" class="button red my-3"
                         style="width: 80%; ${error != null || solveAttempt != null ? "display: none;" : ""} ">Rozwiąż
                 </button>
+
                 <button type="button" class="button red my-3" data-bs-toggle="modal" data-bs-target="#bruteForceModal"
                         style="width: 80%; ${error != null || !"fail".equals(solveAttempt) ? "display: none;" : ""}">
                     Rozwiąż poprzez backtracking
@@ -41,6 +37,8 @@
          style="height: 100%; overflow: auto">
 
         <div class="py-3">
+
+            <%--            displaying various messages sent from backend--%>
             <c:choose>
                 <c:when test="${error != null}">
                     <span class="text-danger fw-bold"> Przesyłane dane były niepoprawne</span>
@@ -59,7 +57,8 @@
                 </c:when>
             </c:choose>
         </div>
-        <%--        <form>--%>
+
+        <%--        sudoku table/input--%>
         <table class="sudokuTable">
             <c:forEach begin="0" end="8" var="row">
                 <tr>
@@ -74,7 +73,8 @@
                                    value="${solution.substring(row * 9 + column, row * 9 + column + 1)}"
                             </c:if>
 
-                                   data-row="${row}" data-column="${column}" data-box="${(row -  row % 3)/ 3 * 3 + (column - column % 3) / 3}">
+                                   data-row="${row}" data-column="${column}"
+                                   data-box="${(row -  row % 3)/ 3 * 3 + (column - column % 3) / 3}">
 
                         </td>
                     </c:forEach>
@@ -82,14 +82,11 @@
             </c:forEach>
         </table>
 
-        <!-- Modal -->
+        <%--       modal for confirming brute force solve - due to number of calculations needed brute force is disabled if over 20 fields are empty--%>
         <div class="modal fade" id="bruteForceModal" tabindex="-1" aria-labelledby="bruteForceModal" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-<%--                    <div class="modal-header">--%>
-<%--                        <h5 class="modal-title">Wybierz zapisaną grę</h5>--%>
-<%--                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>--%>
-<%--                    </div>--%>
+
                     <div class="modal-body">
                         <p>
                             Pola do rozwiązania w sudoku - ${numbersMissing} - backtracking zajmie
@@ -109,10 +106,13 @@
                             </c:choose>
                         </p>
                         <div class="d-flex justify-content-around">
-                        <button type="submit" name="bruteForce" value="bruteForce" class="button red m-3" style="width: 25%; ${numbersMissing > 20 ? "display: none;" : ""}">
-                            Tak
-                        </button>
-                        <button type="button" class="button red m-3" data-bs-dismiss="modal" style="width: 25%">Wróć</button>
+                            <button type="submit" name="bruteForce" value="bruteForce" class="button red m-3"
+                                    style="width: 25%; ${numbersMissing > 20 ? "display: none;" : ""}">
+                                Tak
+                            </button>
+                            <button type="button" class="button red m-3" data-bs-dismiss="modal" style="width: 25%">
+                                Wróć
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -123,10 +123,7 @@
     </div>
     <div class="col-lg-1"></div>
 
-
-
 </div>
-
 
 <jsp:include page="../includes/footer.jsp"/>
 </html>

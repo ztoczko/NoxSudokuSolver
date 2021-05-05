@@ -41,13 +41,13 @@ public class Solve extends HttpServlet {
                 solution = Sudoku.randomizeFieldsSeed(solution, baseSeed.substring(4, 15));
                 quickSolution = true;
                 solveAttempt = "success";
-                request.setAttribute("solution", solution);
+//                request.setAttribute("solution", solution);
             }
         }
         if (numbers.length != 81) {
             isError = true;
         }
-        if (!quickSolution && !isError) {
+        if (!isError) {
             for (String str : numbers) {
                 fieldSeed += str;
                 if (!str.matches("\\d")) {
@@ -83,8 +83,6 @@ public class Solve extends HttpServlet {
         }
         request.setAttribute("solveAttempt", solveAttempt);
         request.setAttribute("solution", solution);
-//        System.out.println("Solution: " + solution);
-//        System.out.println(solveAttempt);
         getServletContext().getRequestDispatcher("/WEB-INF/jsp/solve.jsp").forward(request, response);
     }
 }

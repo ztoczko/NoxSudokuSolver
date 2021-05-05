@@ -19,9 +19,10 @@ public class Game extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//parametry - type new i trudność lub type load i nazwa ciasteczka
+
         request.setAttribute("page", 1);
         boolean isParameterError = false;
+        //type is type of post request - new game or load game
         String type = request.getParameter("type");
         String baseSeed = new String();
         if (type == null || !(type.equals("load") || type.equals("new"))) {
@@ -36,7 +37,6 @@ public class Game extends HttpServlet {
                 if (baseSeed == null) {
                     isParameterError = true;
                 } else {
-//                    Sudoku sudoku = new Sudoku(seed.substring(15));
                     request.setAttribute("baseSeed", baseSeed);
                 }
             }

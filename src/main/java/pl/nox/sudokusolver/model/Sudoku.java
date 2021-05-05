@@ -10,15 +10,16 @@ import java.util.Set;
 
 public class Sudoku {
 
-    private SudokuField[][] fields; //change to private after test phase
+    //objects representing each of the sudoku's field
+    private SudokuField[][] fields;
+
+    //field indicating if sudoku is solved
     private boolean isSolved;
 
-    public boolean isInvalid() {
-        return invalid;
-    }
-
+    //field indicating if sudoku is unsolvable
     private boolean invalid;
 
+    //constructor using int array - used for testing purposes
     public Sudoku(int[] fieldArray) {
 
         SudokuField[][] result = new SudokuField[9][];
@@ -37,6 +38,7 @@ public class Sudoku {
         invalid = false;
     }
 
+    //primary constructor - creating sudoku through String seed
     public Sudoku(String shortSudokuSeed) {
 
         SudokuField[][] result = new SudokuField[9][];
@@ -55,6 +57,11 @@ public class Sudoku {
         invalid = false;
     }
 
+    public boolean isInvalid() {
+        return invalid;
+    }
+
+    //getting String seed of unsolved/partially solved/solved sudoku object
     public String getSeed() {
 
         String result = new String();
@@ -68,6 +75,7 @@ public class Sudoku {
         return result;
     }
 
+    //creating randomizer to shuffle numbers, random turn and mirror of loaded seed for increased replayability
     public static List<Integer> generateSudokuSeedRandomizer() {
 
         Random r = new Random();
@@ -94,6 +102,7 @@ public class Sudoku {
         return randomizer;
     }
 
+    // creating randomized seed based on seed loaded from database
     public static String generateRandomSudokuSeed(int difficulty) {
 
         String shortSeed = SudokuSeedDAO.randomByDifficulty(difficulty);
@@ -108,6 +117,7 @@ public class Sudoku {
         return shortSeed.substring(0, 4) + randomizerStr + randomizeFieldsSeed(shortSeed.substring(4), randomizer);
     }
 
+    //randomize seed using given randomizer
     public static String randomizeFieldsSeed(String fieldsSeed, String randomizer) {
 
         List<Integer> randomizerList = new ArrayList<>();
@@ -117,6 +127,7 @@ public class Sudoku {
         return randomizeFieldsSeed(fieldsSeed, randomizerList);
     }
 
+    //randomize seed using given randomizer
     public static String randomizeFieldsSeed(String fieldsSeed, List<Integer> randomizer) {
 
         String result = new String();
@@ -179,6 +190,7 @@ public class Sudoku {
         return isSolved;
     }
 
+    //solve through backtracking - may take a lot longer than expecting
     public boolean bruteForceSolve() {
 
         List<Integer> unsolved = new ArrayList<>();
@@ -239,6 +251,7 @@ public class Sudoku {
         return false;
     }
 
+    //aggregate method for all reasoning solve methods
     public boolean reasoningSolve() { //add triples
 
         eraseImpossibleValues();
@@ -266,6 +279,7 @@ public class Sudoku {
         }
     }
 
+    //following methods implement varius solving algorithms
     public boolean findAllPairs() {
 
         boolean isChange = false;
@@ -2481,7 +2495,7 @@ public class Sudoku {
         return isChanged;
     }
 
-
+    //removing possible values which are obviously invalid
     public boolean eraseImpossibleValues() {
 
         boolean isChanged = false;
@@ -2551,6 +2565,7 @@ public class Sudoku {
         return isChanged;
     }
 
+    //veryfing whether sudoku is already solved
     public void checkIfSolved() {
 
         for (int i = 0; i < 9; i++) {
@@ -2566,6 +2581,7 @@ public class Sudoku {
         isSolved = true;
     }
 
+    //checking for sudoku fields conflicts
     public void checkIfInvalid() {
 
         for (int row = 0; row < 9; row++) {
@@ -2583,13 +2599,6 @@ public class Sudoku {
                         if ((i != column && fields[row][i].isSolved() && fields[row][i].getPossibleValues().get(0) == fields[row][column].getPossibleValues().get(0)) ||
                                 (i != row && fields[i][column].isSolved() && fields[i][column].getPossibleValues().get(0) == fields[row][column].getPossibleValues().get(0)) ||
                                 (i != (row % 3 * 3 + column % 3) && fields[box / 3 * 3 + i / 3][box % 3 * 3 + i % 3].isSolved() && fields[box / 3 * 3 + i / 3][box % 3 * 3 + i % 3].getPossibleValues().get(0) == fields[row][column].getPossibleValues().get(0))) {
-//                            System.out.println(row);
-//                            System.out.println(column);
-//                            System.out.println(box / 3 * 3 + i / 3);
-//                            System.out.println(box % 3 * 3 + i % 3);
-//                            System.out.println((i != column && fields[row][i].isSolved() && fields[row][i].getPossibleValues().get(0) == fields[row][column].getPossibleValues().get(0)) );
-//                            System.out.println((i != row && fields[i][column].isSolved() && fields[i][column].getPossibleValues().get(0) == fields[i][column].getPossibleValues().get(0)));
-//                            System.out.println((i != (row % 3 * 3 + column % 3) && fields[box / 3 * 3 + i / 3][box % 3 * 3 + i % 3].isSolved() && fields[box / 3 * 3 + i / 3][box % 3 * 3 + i % 3].getPossibleValues().get(0) == fields[row][column].getPossibleValues().get(0)));
                             invalid = true;
                             return;
                         }

@@ -1,16 +1,14 @@
-console.log("test");
-
-const xx = '${page}';
-console.log(xx);
-console.log(page);
 let timer;
+
 // create starting table for all number possibilities for each field
-const possibilities = [];
+let possibilities = [];
 for (let i = 0; i < 81; i++) {
     possibilities.push([1, 2, 3, 4, 5, 6, 7, 8, 9]);
 }
 
+// simple function for string verification - checks if it's null/undefined/empty'
 function isEmpty(strIn) {
+
     if (strIn === undefined) {
         console.log("undefined");
         return true;
@@ -25,10 +23,12 @@ function isEmpty(strIn) {
     }
 }
 
+// function for clearing conflict between two fields
 function clearConflict(baseElement, secondElement) {
 
     let baseConflicts = baseElement.dataset.conflict.split(",");
     let secondConflicts = secondElement.dataset.conflict.split(",");
+
     if (baseConflicts.length == 1) {
         baseElement.classList.remove("bg-danger");
         baseElement.removeAttribute("data-conflict");
@@ -55,9 +55,9 @@ function clearConflict(baseElement, secondElement) {
             document.getElementById("solve").disabled = false;
         }
     }
-
 }
 
+// function for creating conflict between two fields
 function createConflict(baseElement, secondElement) {
 
     if (document.getElementById("save") != null) {
@@ -66,7 +66,6 @@ function createConflict(baseElement, secondElement) {
     if (document.getElementById("solve") != null) {
         document.getElementById("solve").disabled = true;
     }
-
     if (!baseElement.classList.contains("bg-danger")) {
         baseElement.classList.add("bg-danger")
     }
@@ -87,14 +86,17 @@ function createConflict(baseElement, secondElement) {
     }
 }
 
+// function verifying conflict presence within sudoku
 function checkIfConflictExists() {
     return document.querySelector(".sudokuTable input[data-conflict]") != null;
 }
 
+// simple function to forward display possibilities request from event to regular function
 function displayPossibilitiesButtonsEvent() {
     displayPossibilitiesButtons(this.dataset.row, this.dataset.column);
 }
 
+// function displaying buttons which define which values are possible in predefined field - function run each time some field gains focus
 function displayPossibilitiesButtons(row, column) {
 
     const possibilityArray = possibilities[parseInt(row) * 9 + parseInt(column)];
@@ -113,11 +115,12 @@ function displayPossibilitiesButtons(row, column) {
     document.body.appendChild(createLine(thisCoords.right, thisCoords.bottom, possibilitiesElementCoords.left, possibilitiesElementCoords.bottom));
 }
 
+// primary function validating values entered by user - run on value change of any input field
 function runFieldCheckOnChange() {
 
     let number = this.value;
 
-    // removepossibilities display
+    // remove possibilities display
     if (page == 1) {
         if (!this.nextElementSibling.classList.contains("hide")) {
             this.nextElementSibling.classList.add("hide");
@@ -125,42 +128,52 @@ function runFieldCheckOnChange() {
         clearLines();
     }
 
-// find conflicts
+// validating input format
     if (isEmpty(number) || !number.match("^[1-9]$")) {
         this.value = "";
-        console.log(this.value);
         number = undefined;
-        console.log("wrong no");
-        if (this.classList.contains("topElementSolid")) {
-            this.classList.remove("topElementSolid");
-            this.classList.add("topElement");
+        if (page == 1) {
+            if (this.classList.contains("topElementSolid")) {
+                this.classList.remove("topElementSolid");
+                this.classList.add("topElement");
+            }
+            this.nextElementSibling.classList.remove("hide")
+            displayPossibilitiesButtons(this.dataset.row, this.dataset.column);
         }
-        this.nextElementSibling.classList.remove("hide")
-        displayPossibilitiesButtons(this.dataset.row, this.dataset.column);
     }
+
+    // displaying button group controlling field's possible values
     if (!isEmpty(number)) {
-        document.getElementById("possibilitiesBox").classList.add("hide");
-        if (this.classList.contains("topElement")) {
-            this.classList.add("topElementSolid");
-            this.classList.remove("topElement");
+        if (page == 1) {
+            document.getElementById("possibilitiesBox").classList.add("hide");
+            if (this.classList.contains("topElement")) {
+                this.classList.add("topElementSolid");
+                this.classList.remove("topElement");
+            }
         }
         const table = document.querySelector(".sudokuTable");
         const value = this.value;
         const row = this.dataset.row;
         const column = this.dataset.column;
         const box = this.dataset.box;
+
+        // search for conflicts in a row
         const rowElements = table.querySelectorAll("input[data-row=\"" + row + "\"]");
         rowElements.forEach((item) => {
             if (value == item.value && column != item.dataset.column) {
                 createConflict(this, item);
             }
         });
+
+        // search for conflicts in a column
         const columnElements = table.querySelectorAll("input[data-column=\"" + column + "\"]");
         columnElements.forEach((item) => {
             if (value == item.value && row != item.dataset.row) {
                 createConflict(this, item);
             }
         });
+
+        // search for conflicts in a box
         const boxElements = table.querySelectorAll("input[data-box=\"" + box + "\"]");
         boxElements.forEach((item) => {
             if (value == item.value && (row != item.dataset.row || column != item.dataset.column)) {
@@ -168,24 +181,22 @@ function runFieldCheckOnChange() {
             }
         });
     }
-    // clear conflicts
+
+    // clear conflicts if applicable
     if (!isEmpty(this.dataset.conflict)) {
         const conflicts = this.dataset.conflict.split(",");
-        console.log(conflicts);
         conflicts.forEach((item) => {
-            console.log(document.querySelector("input[data-row=\"" + item.substring(0, 1) + "\"][data-column=\"" + item.substring(1, 2) + "\"]"));
-            console.log("input[data-row=\"" + item.substring(0, 1) + "\"][data-column=\"" + item.substring(1, 2) + "\"]");
+
             if (number != document.querySelector("input[data-row=\"" + item.substring(0, 1) + "\"][data-column=\"" + item.substring(1, 2) + "\"]").value) {
                 clearConflict(this, document.querySelector("input[data-row=\"" + item.substring(0, 1) + "\"][data-column=\"" + item.substring(1, 2) + "\"]"));
             }
         });
-
     }
-
+    //check if sudoku is complete
     checkCompleteCondition();
-
 }
 
+//verifying sudoku completion
 function checkCompleteCondition() {
 
     if (document.querySelector("[data-conflict]") == null) {
@@ -226,19 +237,23 @@ function checkCompleteCondition() {
     }
 }
 
+//reseting game to baseseed - clearing conflicts, entered values and possible values table - function bound to button through click event
 function resetGame() {
 
+    possibilities = [];
+    for (let i = 0; i < 81; i++) {
+        possibilities.push([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    }
     document.querySelectorAll(".sudokuTable input").forEach((item, index) => {
         item.removeAttribute("data-conflict");
         item.classList.remove("bg-danger");
-        console.log(baseSeed.substring(15 + index, 16 + index));
+
         if (baseSeed.substring(15 + index, 16 + index) == "0") {
             item.removeAttribute("readonly");
             if (item.classList.contains("topElementSolid")) {
                 item.classList.remove("topElementSolid");
                 item.classList.add("topElement");
                 item.nextElementSibling.classList.remove("hide");
-                console.log(item.nextElementSibling);
             }
         }
         if (!item.hasAttribute("readonly")) {
@@ -251,6 +266,7 @@ function resetGame() {
     }
 }
 
+//saving gameseed to cookie - function bound to button through click event
 function saveGame() {
 
     let saveSeed = baseSeed.substring(0, 15);
@@ -261,12 +277,9 @@ function saveGame() {
 
     const date = new Date();
     date.setTime(date.getTime());
-    // let formatter = new Intl.DateTimeFormat('en', { year: 'numeric', month: 'numeric', day: 'numeric'}).format(date);
+
     let dateStr = date.getFullYear() + "-" + (date.getMonth() < 9 ? "0" : "") + (date.getMonth() + 1) + "-" + (date.getDate() < 10 ? "0" : "") + date.getDate() + "_" + (date.getHours() < 10 ? "0" : "") + date.getHours() + "h" + (date.getMinutes() < 10 ? "0" : "") + date.getMinutes() + "m" + (date.getSeconds() < 10 ? "0" : "") + date.getSeconds() + "s";
 
-    // dateStr = dateStr.substring(dateStr.indexOf(",") + 1);
-    // const dateArray = dateStr.split(" ");
-    // dateStr = dateArray
     setCookie("save" + dateStr + "-seed-" + saveSeed.substring(0, 15), saveSeed, 365);
 
     const newLoad = document.createElement("OPTION");
@@ -275,6 +288,7 @@ function saveGame() {
     document.getElementById("loadMenu").appendChild(newLoad);
 }
 
+// creating new cookie
 function setCookie(name, value, expiry) {
 
     const date = new Date();
@@ -283,6 +297,7 @@ function setCookie(name, value, expiry) {
     document.cookie = name + "=" + value + ";" + expireString + ";path=/";
 }
 
+// getting cookie value for predetermined cookie key
 function getCookieValue(name) {
 
     const cookies = document.cookie.split(";");
@@ -298,23 +313,18 @@ function getCookieValue(name) {
     return null;
 }
 
+//function showing value of random empty or invalid field - function bound to button through click event
 function displayHint() {
 
     const emptyFields = [];
     document.querySelectorAll(".sudokuTable input").forEach((item) => {
         if (!item.value.match("^[1-9]$") || item.value != solution.substring(parseInt(item.dataset.row) * 9 + parseInt(item.dataset.column), parseInt(item.dataset.row) * 9 + parseInt(item.dataset.column) + 1)) {
-            console.log(item.value);
-            console.log(solution.substring(parseInt(item.dataset.row) * 9 + parseInt(item.dataset.column), parseInt(item.dataset.row) * 9 + parseInt(item.dataset.column) + 1));
             emptyFields.push({row: item.dataset.row, column: item.dataset.column});
         }
     });
     const chosenField = Math.floor(Math.random() * emptyFields.length);
     const chosenElement = document.querySelector("[data-row=\"" + emptyFields[chosenField].row + "\"][data-column=\"" + emptyFields[chosenField].column + "\"]");
     chosenElement.value = solution.substring(parseInt(emptyFields[chosenField].row) * 9 + parseInt(emptyFields[chosenField].column), parseInt(emptyFields[chosenField].row) * 9 + parseInt(emptyFields[chosenField].column) + 1);
-    console.log(solution.substring(emptyFields[chosenField].row * 9 + emptyFields[chosenField].column, emptyFields[chosenField].row * 9 + emptyFields[chosenField].column + 1));
-    console.log(solution);
-    console.log(emptyFields[chosenField].row * 9 + emptyFields[chosenField].column);
-    console.log(emptyFields);
     chosenElement.classList.add("bg-primary");
     chosenElement.dispatchEvent(new Event("change"));
     const bgDelay = setTimeout(() => {
@@ -341,6 +351,7 @@ function displayHint() {
 
 }
 
+//clearing all lines present in document
 function clearLines() {
     if (document.querySelector("[data-line]") != null) {
         document.querySelectorAll("[data-line]").forEach((item) => {
@@ -349,7 +360,7 @@ function clearLines() {
     }
 }
 
-// drawing line (to possiblilities)
+// drawing line - function called by create line which calculates its parameters
 function createLineElement(x, y, length, angle) {
     let line = document.createElement("div");
     let styles = 'border: 1px dashed orange; '
@@ -369,6 +380,7 @@ function createLineElement(x, y, length, angle) {
     return line;
 }
 
+//function calculating parameters for line element - needed for drawing lines indicating which field's possible values are being edited
 function createLine(x1, y1, x2, y2) {
     let a = x1 - x2,
         b = y1 - y2,
@@ -381,14 +393,14 @@ function createLine(x1, y1, x2, y2) {
     return createLineElement(x, y, c, alpha);
 }
 
-// toggling possible value for predetermined field
+// toggling possible value for predetermined field  - function bound to button through click event
 function verifyButtonPossiblity() {
 
     if (this.classList.contains("bg-secondary")) {
         this.classList.remove("bg-secondary");
         possibilities[parseInt(this.dataset.field)].push(this.innerText);
         document.querySelector(".col-4[data-field=\"" + this.dataset.field + "\"][data-number=\"" + this.innerText + "\"]").innerText = this.innerText;
-        console.log(document.getElementById("possibility".concat(this.innerText)));
+
     } else {
         this.classList.add("bg-secondary");
         document.querySelector(".col-4[data-field=\"" + this.dataset.field + "\"][data-number=\"" + this.innerText + "\"]").innerText = " ";
@@ -399,7 +411,6 @@ function verifyButtonPossiblity() {
 }
 
 //solve animation for auto-solve
-
 if (page == 2 && solveAttempt != null) {
     window.addEventListener("load", () => {
 
@@ -425,7 +436,7 @@ if (page == 2 && solveAttempt != null) {
 }
 
 
-// timer
+// sudoku solve timer
 if (page == 1 && gamePlayed != null) {
     timer = setInterval(() => {
         let seconds = parseInt(document.getElementById("seconds").innerText);
@@ -446,10 +457,9 @@ if (page == 1 && gamePlayed != null) {
     }, 1000);
 }
 
-// czy wszystko dać w window load??
-//porównywanie stringów
+//porównywanie stringów???
 
-//save, hint i reset
+//boundind functions to save, hint and reset buttons
 if (page == 1) {
     document.getElementById("save").addEventListener("click", saveGame);
     document.getElementById("sudokuReset").addEventListener("click", resetGame);
@@ -482,11 +492,11 @@ window.addEventListener("load", () => {
     ;
 });
 
-// remove possibilities display from disabled fields on load
+// remove possibilities view from filled fields on load
 if (page == 1) {
     window.addEventListener("load", () => {
         document.querySelectorAll(".possibilitiesTable").forEach((item) => {
-            if (item.previousElementSibling.hasAttribute("readonly")) {
+            if (item.previousElementSibling.hasAttribute("readonly") || item.previousElementSibling.value.match("^[1-9]$")) {
                 item.classList.add("hide");
                 item.previousElementSibling.classList.remove("topElement");
                 item.previousElementSibling.classList.add("topElementSolid");
@@ -495,26 +505,28 @@ if (page == 1) {
     });
 }
 
-//numbers validation
+//primary numbers validation in sudoku field/form
 document.querySelectorAll(".sudokuTable input").forEach((item) => {
     item.addEventListener("change", runFieldCheckOnChange);
 });
 
-function createLinesToPossibilities() {
-    clearLines();
-    const possibilitiesElementCoords = document.getElementById("possibilitiesBox").getBoundingClientRect();
-    const thisCoords = this.getBoundingClientRect();
-    console.log(thisCoords.right, thisCoords.top, possibilitiesElementCoords.left, possibilitiesElementCoords.top);
-    document.body.appendChild(createLine(thisCoords.right, thisCoords.top, possibilitiesElementCoords.left, possibilitiesElementCoords.top));
-    document.body.appendChild(createLine(thisCoords.right, thisCoords.bottom, possibilitiesElementCoords.left, possibilitiesElementCoords.bottom));
-    displayPossibilitiesButtons(this.dataset.row, this.dataset.column);
-}
+// function createLinesToPossibilities() {
+//     clearLines();
+//     const possibilitiesElementCoords = document.getElementById("possibilitiesBox").getBoundingClientRect();
+//     const thisCoords = this.getBoundingClientRect();
+//     console.log(thisCoords.right, thisCoords.top, possibilitiesElementCoords.left, possibilitiesElementCoords.top);
+//     document.body.appendChild(createLine(thisCoords.right, thisCoords.top, possibilitiesElementCoords.left, possibilitiesElementCoords.top));
+//     document.body.appendChild(createLine(thisCoords.right, thisCoords.bottom, possibilitiesElementCoords.left, possibilitiesElementCoords.bottom));
+//     displayPossibilitiesButtons(this.dataset.row, this.dataset.column);
+// }
 
 
-// displaying possibilities after click
+// handling displaying field's possible values through event
 if (page == 1) {
     document.querySelectorAll(".sudokuTable input").forEach((item) => {
-        item.addEventListener("focus", displayPossibilitiesButtonsEvent);
+        if (!item.hasAttribute("readonly")) {
+            item.addEventListener("focus", displayPossibilitiesButtonsEvent);
+        }
     });
 }
 
@@ -528,5 +540,10 @@ if (page == 1) {
 
 }
 
-
-// document.body.appendChild(createLine(100, 100, 200, 200));
+// removing possibility for accidental submitting form when pressing enter key
+window.addEventListener('keydown', function (e) {
+    if (e.keyIdentifier == 'U+000A' || e.keyIdentifier == 'Enter' || e.keyCode == 13) {
+        e.preventDefault();
+        return false;
+    }
+}, true);

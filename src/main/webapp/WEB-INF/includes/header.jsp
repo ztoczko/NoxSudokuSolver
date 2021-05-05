@@ -10,6 +10,8 @@
 
 </head>
 <body>
+
+<%--number of values used in external Javascript files--%>
 <script type="text/javascript">
     var page = ${page};
     var gamePlayed = null;
@@ -23,11 +25,13 @@
     solution = "${solution}";
     </c:if>
     <c:if test="${solveAttempt != null}">
-        solveAttempt = "${solveAttempt}";
-        originalSeed = "${originalSeed}";
-        solution = "${solution}";
+    solveAttempt = "${solveAttempt}";
+    originalSeed = "${originalSeed}";
+    solution = "${solution}";
     </c:if>
 </script>
+
+<%--topbar--%>
 <div class="container-fluid p-0 m-0" style="min-height: 100vh;">
     <div class="row p-0 m-0" style="height: 20vh; width: 100%;">
         <div class="col-12 topbar d-flex justify-content-center align-items-end"> <!--dodać buttony z językami!!-->
